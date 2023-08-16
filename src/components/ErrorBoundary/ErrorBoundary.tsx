@@ -9,10 +9,7 @@ interface IErrorBoundaryProps extends PropsWithChildren {
 }
 
 export const ErrorBoundary: FC<IErrorBoundaryProps> = ( props ) => {
-    const {
-        ReactElementErrorBoundaryFailBack = ErrorBoundaryFailBack,
-        children,
-    } = props;
+    const { ReactElementErrorBoundaryFailBack = ErrorBoundaryFailBack, children } = props;
 
     const [ error, errorSet ] = useState<unknown>();
     const [ info, infoSet ] = useState<unknown>();

@@ -59,13 +59,6 @@ export const isDataProcessing = <D>( value: unknown ): value is IDataProcessing<
     && "isFetching" in value
     && "timestamp" in value;
 
-export const isIStateRepository = <D>( value: unknown ): value is IStateRepository<D> => !!value
-    && isObject( value )
-    && "entities" in value
-    && "lists" in value
-    && "pages" in value;
+export const isIStateRepository = <D>( value: unknown ): value is IStateRepository<D> => !!value && isObject( value ) && "entities" in value && "lists" in value && "pages" in value;
 
-export const isTDPStateRepository = <D>( value: unknown ): value is TDPStateRepository<D> => !!value
-    && isDataProcessing( value )
-    && isObject( value.data )
-    && isIStateRepository( value.data );
+export const isTDPStateRepository = <D>( value: unknown ): value is TDPStateRepository<D> => !!value && isDataProcessing( value ) && isObject( value.data ) && isIStateRepository( value.data );

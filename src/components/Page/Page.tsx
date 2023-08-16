@@ -25,4 +25,3 @@ export const Page: FC = () => {
         </Box>
     );
 };
-

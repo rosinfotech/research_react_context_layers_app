@@ -33,32 +33,17 @@ export const ErrorBoundaryFailBack: FC<IErrorBoundaryFailBackProps> = ( props ) 
                 width          : "100%",
             } }
         >
-            <h1 style={ styleDefault } >Error</h1>
-            {
-                isError( error )
-                    ? (
-                        <>
-                            <h2 style={ styleDefault } >{String( error.stack )}</h2>
-                            <pre style={ stylePreDefault } >
-                                { error.message.replace( /\\n/g, "\n" ) }
-                            </pre>
-                        </>
-                    )
-                    : <h2 style={ styleDefault } >{String( error )}</h2>
-
-            }
-            {
-                isObject( info )
-                    ? (
-                        <pre
-                            style={ stylePreDefault }
-                        >
-                            { JSON.stringify( info ).replace( /\\n/g, "\n" ) }
-                        </pre>
-                    )
-                    : <h2 style={ styleDefault } >{String( info )}</h2>
-
-            }
+            <h1 style={ styleDefault }>Error</h1>
+            {isError( error ) ? (
+                <>
+                    <h2 style={ styleDefault }>{String( error.stack )}</h2>
+                    <pre style={ stylePreDefault }>{error.message.replace( /\\n/g, "\n" )}</pre>
+                </>
+            )
+                : <h2 style={ styleDefault }>{String( error )}</h2>}
+            {isObject( info )
+                ? <pre style={ stylePreDefault }>{JSON.stringify( info ).replace( /\\n/g, "\n" )}</pre>
+                : <h2 style={ styleDefault }>{String( info )}</h2>}
         </div>
     );
 };

@@ -76,7 +76,6 @@ export class ContextStateFacade {
     }
 
     public async stateRepositoryEntityDelete<E>( options: IStateRepositoryEntityDeleteOptions ) {
-
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "1508231755" );
         }
@@ -105,27 +104,21 @@ export class ContextStateFacade {
         delete stateRepository.data.entities[ id ];
 
         for ( const [ , list ] of Object.entries( stateRepository.data.lists ) ) {
-
             if ( !!list.data && list.data.includes( id ) ) {
                 list.data = list.data.filter( v => v !== id );
             }
-
         }
 
         for ( const [ , pages ] of Object.entries( stateRepository.data.pages ) ) {
-
             if ( !pages.data ) {
                 continue;
             }
 
             for ( const [ page, list ] of Object.entries( pages.data ) ) {
-
                 if ( list.includes( id ) ) {
                     pages.data[ page ] = list.filter( v => v !== id );
                 }
-
             }
-
         }
 
         await entityDeleteAPI( id );
@@ -133,11 +126,9 @@ export class ContextStateFacade {
         this.dataSet( {
             [ stateRepositoryName ]: stateRepository,
         } );
-
     }
 
     public async stateRepositoryEntitiesListGet<E>( options: IStateRepositoryEntitiesGetOptions<E> ) {
-
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "2807231447" );
         }
@@ -184,7 +175,9 @@ export class ContextStateFacade {
         }, stateRepository.data.entities );
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        stateRepository.data.lists[ DEFAULT_PARAMS_STRING ] = stateRepository.data.lists[ DEFAULT_PARAMS_STRING ] ?? ContextStateFacade.dataProcessingGenerate<TEntitiesList>( [] );
+        stateRepository.data.lists[ DEFAULT_PARAMS_STRING ]
+            = stateRepository.data.lists[ DEFAULT_PARAMS_STRING ]
+            ?? ContextStateFacade.dataProcessingGenerate<TEntitiesList>( [] );
 
         data.reduce( ( acc, item ) => {
             acc.data?.push( String( item[ idField ] ) );
@@ -197,7 +190,6 @@ export class ContextStateFacade {
         } );
 
         return stateRepository.data.lists[ DEFAULT_PARAMS_STRING ].data;
-
     }
 
 }

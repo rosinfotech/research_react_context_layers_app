@@ -34,7 +34,7 @@ export class RepositoryUsers extends RepositoryAbstract<IUser> {
     };
 
     // eslint-disable-next-line
-    public async entityDelete ( id: TId ) {
+    public async entityDelete(id: TId) {
         this.isInitializedException();
 
         await this.contextStateFacade?.stateRepositoryEntityDelete<IUser>( {

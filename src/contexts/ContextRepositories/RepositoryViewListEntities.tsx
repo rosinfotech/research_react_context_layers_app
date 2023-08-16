@@ -24,9 +24,7 @@ export const RepositoryViewListEntities = <E,>( props: IRepositoryViewArrayEntit
                     return;
                 }
                 entitiesRenderedSet(
-                    listEntities.map(
-                        id => <ReactElementRenderer key={ id } id={ id } />,
-                    ),
+                    listEntities.map( id => <ReactElementRenderer key={ id } id={ id } /> ),
                 );
             } )
             .catch( ( e ) => {

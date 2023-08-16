@@ -39,11 +39,17 @@ export class RepositoryAbstract<E> {
     }
 
     public async entityDeleteAPI ( id: TId ): Promise<void> {
-        throw new ErrorCode( "1608231347", `Method "entityDeleteAPI" must be implemented. Call with <${ id }>` );
+        throw new ErrorCode(
+            "1608231347",
+            `Method "entityDeleteAPI" must be implemented. Call with <${ id }>`,
+        );
     }
 
     public async entityDelete ( id: TId ): Promise<void> {
-        throw new ErrorCode( "1508231736", `Method "entityDelete" must be implemented. Call with <${ id }>` );
+        throw new ErrorCode(
+            "1508231736",
+            `Method "entityDelete" must be implemented. Call with <${ id }>`,
+        );
     }
 
     public entitiesListAPI = async (): Promise<TResponseArrayEntity<E>> => {
