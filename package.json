@@ -1,15 +1,17 @@
 {
     "author": "rosinfo.tech",
     "browserslist": [
-        ">0.2%",
+        "> 0.2%",
         "not dead",
-        "ie <= 9"
+        "not safari < 14.1"
     ],
     "dependencies": {
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.0",
-        "@mui/material": "^5.13.5",
-        "@rosinfo.tech/utils": "^0.1.19",
+        "@mui/icons-material": "^5.14.3",
+        "@mui/material": "^5.14.5",
+        "@rosinfo.tech/react": "^0.0.7",
+        "@rosinfo.tech/utils": "^0.2.2",
         "axios": "^1.4.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
@@ -17,10 +19,10 @@
     },
     "description": "",
     "devDependencies": {
-        "@types/node": "^17.0.43",
-        "@types/react": "^18.0.12",
-        "@types/react-dom": "^18.0.5",
-        "husky": "^6.0.0"
+        "@types/node": "^20.5.0",
+        "@types/react": "^18.2.20",
+        "@types/react-dom": "^18.2.7",
+        "husky": "^8.0.3"
     },
     "keywords": [],
     "main": "./src/index.tsx",
@@ -33,5 +35,5 @@
         "pre_commit": "rosinfo.tech linters --exitOnWarningsErrors --path ./src"
     },
     "type": "module",
-    "version": "0.0.1"
+    "version": "0.0.2"
 }

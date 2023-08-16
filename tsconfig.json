@@ -42,6 +42,12 @@
             "@src/*": [
                 "src/*"
             ],
+            "@@types": [
+                "src/types"
+            ],
+            "@@types/*": [
+                "src/types/*"
+            ],
             "@utils": [
                 "src/utils"
             ],

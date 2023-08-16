@@ -1,24 +1,23 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { createContext, useContext, useContextSelector } from "use-context-selector";
+import { ContextStateFacade } from "./ContextStateFacade";
 import type { IContextStateProviderState, IContextStateValue } from "./types";
 import type { FC, PropsWithChildren } from "react";
 
-const initialState: IContextStateProviderState = {
-    state1: 0,
-    state2: 0,
-    state3: 0,
+export const contextStateFacade = new ContextStateFacade();
+
+const contextStateInitialState: IContextStateProviderState = {
+    repositoryUsers: null,
 };
 
-const contextStateStateSetDefault = ( stateUpdate: Partial<IContextStateProviderState> ) => {
-    throw new Error(
-        `contextStateStateSet is undefined. stateUpdate is <${ JSON.stringify( stateUpdate ) }>`,
-    );
+const contextStateInitialValue: IContextStateValue = {
+    contextStateFacade,
+    data   : contextStateInitialState,
+    dataGet: null,
+    dataSet: null,
 };
 
-export const ContextState = createContext<IContextStateValue>( {
-    ...initialState,
-    contextStateStateSet: contextStateStateSetDefault,
-} );
+export const ContextState = createContext<IContextStateValue>( contextStateInitialValue );
 
 export function useContextState (): IContextStateValue {
     return useContext( ContextState );
@@ -31,23 +30,34 @@ export function useContextStateSelector<Selected> (
 }
 
 export const ContextStateProvider: FC<PropsWithChildren> = ( { children } ) => {
-    const [ state, setState ] = useState<IContextStateProviderState>( initialState );
+    const [ data, dataSetEffect ] = useState<IContextStateProviderState>( contextStateInitialState );
+    const dataRef = useRef( data );
+    const dataGet = useCallback( () => dataRef.current, [] );
 
-    const contextStateStateSet = useCallback( ( stateUpdate: Partial<IContextStateProviderState> ) => {
-        console.log( `contextStateStateSet <${ JSON.stringify( stateUpdate ) }>` );
-        setState( prevState => ( {
-            ...prevState,
-            ...stateUpdate,
-        } ) );
+    const dataSet = useCallback( ( dataNext: Partial<IContextStateProviderState> ) => {
+        dataSetEffect( ( dataPrev ) => {
+            const dataUpdated = {
+                ...dataPrev,
+                ...dataNext,
+            };
+            dataRef.current = dataUpdated;
+            return dataUpdated;
+        } );
     }, [] );
+
+    contextStateFacade.dataGet = dataGet;
+
+    contextStateFacade.dataSet = dataSet;
 
     const value = useMemo<IContextStateValue>( () => {
         const valueNew = {
-            ...state,
-            contextStateStateSet,
+            contextStateFacade,
+            data,
+            dataGet,
+            dataSet,
         };
         return valueNew;
-    }, [ contextStateStateSet, state ] );
+    }, [ data, dataGet, dataSet ] );
 
     return <ContextState.Provider value={ value }>{children}</ContextState.Provider>;
 };

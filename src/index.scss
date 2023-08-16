@@ -14,8 +14,6 @@ html {
 }
 
 body {
-    background-color: #000099;
-    color: #ffffff;
     height: 100%;
     margin: 0;
     padding: 0;
@@ -28,11 +26,4 @@ body {
         width: 100vw;
     }
 
-    * div {
-        align-items: center;
-        border: 1px solid #ffffff;
-        display: inline-flex;
-        justify-content: center;
-        padding: 30px;
-    }
 }

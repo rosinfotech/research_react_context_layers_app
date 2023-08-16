@@ -1,12 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
+import { ErrorBoundaryFailBack } from "./ErrorBoundaryFailBack";
 import { ErrorBoundaryInner } from "./ErrorBoundaryInner";
+import type { IErrorBoundaryFailBackProps } from "./ErrorBoundaryFailBack";
 import type { FC, PropsWithChildren } from "react";
 
-export const ErrorBoundary: FC<PropsWithChildren> = ( props ) => {
-    const { children } = props;
+interface IErrorBoundaryProps extends PropsWithChildren {
+    ReactElementErrorBoundaryFailBack?: FC<IErrorBoundaryFailBackProps>;
+}
 
-    const [ , errorSet ] = useState<unknown>();
-    const [ , infoSet ] = useState<unknown>();
+export const ErrorBoundary: FC<IErrorBoundaryProps> = ( props ) => {
+    const {
+        ReactElementErrorBoundaryFailBack = ErrorBoundaryFailBack,
+        children,
+    } = props;
+
+    const [ error, errorSet ] = useState<unknown>();
+    const [ info, infoSet ] = useState<unknown>();
 
     const errorInfoSet = useCallback( ( error: unknown, info?: unknown ) => {
         errorSet( error );
@@ -16,6 +25,7 @@ export const ErrorBoundary: FC<PropsWithChildren> = ( props ) => {
     useEffect( () => {
         const handlePromiseRejectionEvent = ( event: PromiseRejectionEvent ): void => {
             if ( !event.reason ) {
+                return;
             }
             errorInfoSet( event.reason );
         };
@@ -29,9 +39,9 @@ export const ErrorBoundary: FC<PropsWithChildren> = ( props ) => {
         };
     }, [ errorInfoSet ] );
 
-    return (
-        <ErrorBoundaryInner onError={ errorInfoSet } >
-            {children}
-        </ErrorBoundaryInner>
-    );
+    if ( !!error ) {
+        return <ReactElementErrorBoundaryFailBack error={ error } info={ info } />;
+    }
+
+    return <ErrorBoundaryInner onError={ errorInfoSet }>{children}</ErrorBoundaryInner>;
 };

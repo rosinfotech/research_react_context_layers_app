@@ -10,7 +10,10 @@ interface IErrorBoundaryInnerProps {
     onError: ( error: unknown, info?: unknown ) => void;
 }
 
-export class ErrorBoundaryInner extends Component<PropsWithChildren<IErrorBoundaryInnerProps>, IErrorBoundaryInnerState> {
+export class ErrorBoundaryInner extends Component<
+PropsWithChildren<IErrorBoundaryInnerProps>,
+IErrorBoundaryInnerState
+> {
 
     constructor ( props: IErrorBoundaryInnerProps ) {
         super( props );
