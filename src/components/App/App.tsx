@@ -1,11 +1,12 @@
-import { Page } from "@components/Page";
 import { ContextAPIProvider } from "@contexts/ContextAPI";
 import { ContextEnvironmentProvider } from "@contexts/ContextEnvironment";
+import { ContextFormsProvider } from "@contexts/ContextForms";
 import { ContextRepositoriesProvider } from "@contexts/ContextRepositories";
 import { ContextServicesProvider } from "@contexts/ContextServices";
 import { ContextStateProvider } from "@contexts/ContextState";
 import { ThemeProvider, createTheme } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
+import { PageIndex } from "@pages/PageIndex";
 import { ErrorBoundary } from "../ErrorBoundary";
 import type { FC } from "react";
 
@@ -18,10 +19,12 @@ export const App: FC = () => (
                 <ContextAPIProvider>
                     <ContextServicesProvider>
                         <ContextRepositoriesProvider>
-                            <ThemeProvider theme={ theme }>
-                                <CssBaseline />
-                                <Page />
-                            </ThemeProvider>
+                            <ContextFormsProvider>
+                                <ThemeProvider theme={ theme }>
+                                    <CssBaseline />
+                                    <PageIndex />
+                                </ThemeProvider>
+                            </ContextFormsProvider>
                         </ContextRepositoriesProvider>
                     </ContextServicesProvider>
                 </ContextAPIProvider>

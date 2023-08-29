@@ -1,7 +1,7 @@
 import { useContextRepositories } from "@contexts/ContextRepositories";
 import { type TId, useContextStateSelector } from "@contexts/ContextState";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { Avatar, Box, IconButton, Typography } from "@mui/material";
+import { Avatar, Box, IconButton, Typography, styled } from "@mui/material";
 import { useColorizeRender } from "@rosinfo.tech/react";
 import { ErrorCode } from "@rosinfo.tech/utils";
 import type { SxProps } from "@mui/material";
@@ -16,6 +16,20 @@ const sxMarginPaddingNo: SxProps = {
     padding: 0,
 };
 
+export const BoxStyledRendererUser = styled( Box )( {
+    alignContent  : "center",
+    alignItems    : "center",
+    display       : "flex",
+    flexDirection : "column",
+    flexWrap      : "unset",
+    height        : 128,
+    justifyContent: "center",
+    margin        : 10,
+    overflow      : "hidden",
+    padding       : 5,
+    width         : 128,
+} );
+
 export const UserRenderer: FC<IUserRendererProps> = ( props ) => {
     const { id } = props;
 
@@ -25,7 +39,7 @@ export const UserRenderer: FC<IUserRendererProps> = ( props ) => {
     } );
 
     const user = useContextStateSelector(
-        state => state.data.repositoryUsers?.data?.entities[ id ]?.data,
+        state => state.data.repositories.users?.data?.entities[ id ]?.data,
     );
 
     const { repositoryUsers } = useContextRepositories();
@@ -35,19 +49,8 @@ export const UserRenderer: FC<IUserRendererProps> = ( props ) => {
     }
 
     return (
-        <Box
+        <BoxStyledRendererUser
             ref={ colorizeRenderRef }
-            alignContent="center"
-            alignItems="center"
-            display="flex"
-            flexDirection="column"
-            flexWrap="unset"
-            height={ 128 }
-            justifyContent="center"
-            m={ 1 }
-            overflow="hidden"
-            p={ 0.5 }
-            width={ 128 }
         >
             <Avatar sx={ sxMarginPaddingNo }>{user.login.split( "" )[ 0 ].toLocaleUpperCase()}</Avatar>
             <Typography component={ Box } sx={ sxMarginPaddingNo }>
@@ -64,6 +67,6 @@ export const UserRenderer: FC<IUserRendererProps> = ( props ) => {
             >
                 <CancelIcon />
             </IconButton>
-        </Box>
+        </BoxStyledRendererUser>
     );
 };

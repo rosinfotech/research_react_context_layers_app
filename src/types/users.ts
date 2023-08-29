@@ -9,3 +9,9 @@ export interface IUser {
     timestampCreate: number;
     timestampUpdate: number;
 }
+
+export type TUserFormUpdate = Omit<IUser, "id" | "deleted" | "timestampCreate" | "timestampUpdate">;
+
+export interface IUserFormCreate extends TUserFormUpdate {
+    passwordConfirm: string;
+}

@@ -1,20 +1,26 @@
+import { objectClone } from "@rosinfo.tech/utils";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createContext, useContext, useContextSelector } from "use-context-selector";
 import { ContextStateFacade } from "./ContextStateFacade";
-import type { IContextStateProviderState, IContextStateValue } from "./types";
+import type { IContextStateData, IContextStateValue } from "./types";
 import type { FC, PropsWithChildren } from "react";
 
-export const contextStateFacade = new ContextStateFacade();
+export const stateFacade = new ContextStateFacade();
 
-const contextStateInitialState: IContextStateProviderState = {
-    repositoryUsers: null,
+const contextStateInitialState: IContextStateData = {
+    forms: {
+        userCreate: null,
+    },
+    repositories: {
+        users: null,
+    },
 };
 
 const contextStateInitialValue: IContextStateValue = {
-    contextStateFacade,
     data   : contextStateInitialState,
     dataGet: null,
     dataSet: null,
+    stateFacade,
 };
 
 export const ContextState = createContext<IContextStateValue>( contextStateInitialValue );
@@ -30,31 +36,36 @@ export function useContextStateSelector<Selected> (
 }
 
 export const ContextStateProvider: FC<PropsWithChildren> = ( { children } ) => {
-    const [ data, dataSetEffect ] = useState<IContextStateProviderState>( contextStateInitialState );
+    const [ data, dataSetEffect ] = useState<IContextStateData>( contextStateInitialState );
     const dataRef = useRef( data );
     const dataGet = useCallback( () => dataRef.current, [] );
 
-    const dataSet = useCallback( ( dataNext: Partial<IContextStateProviderState> ) => {
+    const dataSet = useCallback( ( dataNext: Partial<IContextStateData> ) => {
         dataSetEffect( ( dataPrev ) => {
             const dataUpdated = {
                 ...dataPrev,
                 ...dataNext,
             };
             dataRef.current = dataUpdated;
+
+            console.log( `ContextStateProvider` );
+            console.log( `State update` );
+            console.log( objectClone( dataUpdated ) );
+
             return dataUpdated;
         } );
     }, [] );
 
-    contextStateFacade.dataGet = dataGet;
+    stateFacade.dataGet = dataGet;
 
-    contextStateFacade.dataSet = dataSet;
+    stateFacade.dataSet = dataSet;
 
     const value = useMemo<IContextStateValue>( () => {
         const valueNew = {
-            contextStateFacade,
             data,
             dataGet,
             dataSet,
+            stateFacade,
         };
         return valueNew;
     }, [ data, dataGet, dataSet ] );

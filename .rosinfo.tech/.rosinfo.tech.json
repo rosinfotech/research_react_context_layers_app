@@ -58,7 +58,12 @@
                     "@@types": "./src/types",
                     "@components": "./src/components",
                     "@contexts": "./src/contexts",
+                    "@dialogs": "./src/dialogs",
+                    "@forms": "./src/forms",
+                    "@hocs": "./src/hocs",
                     "@hooks": "./src/hooks",
+                    "@pages": "./src/pages",
+                    "@renderers": "./src/renderers",
                     "@src": "./src",
                     "@utils": "./src/utils"
                 },
@@ -78,7 +83,12 @@
                 "@@types": "./src/types",
                 "@components": "./src/components",
                 "@contexts": "./src/contexts",
+                "@dialogs": "./src/dialogs",
+                "@forms": "./src/forms",
+                "@hocs": "./src/hocs",
                 "@hooks": "./src/hooks",
+                "@pages": "./src/pages",
+                "@renderers": "./src/renderers",
                 "@src": "./src",
                 "@utils": "./src/utils"
             },
@@ -147,7 +157,12 @@
                     "@@types": "./src/types",
                     "@components": "./src/components",
                     "@contexts": "./src/contexts",
+                    "@dialogs": "./src/dialogs",
+                    "@forms": "./src/forms",
+                    "@hocs": "./src/hocs",
                     "@hooks": "./src/hooks",
+                    "@pages": "./src/pages",
+                    "@renderers": "./src/renderers",
                     "@src": "./src",
                     "@utils": "./src/utils"
                 },
@@ -163,5 +178,5 @@
         },
         "target": "web"
     },
-    "version": "0.0.3"
+    "version": "0.0.6"
 }

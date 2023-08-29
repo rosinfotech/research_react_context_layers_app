@@ -30,11 +30,41 @@
             "@components/*": [
                 "src/components/*"
             ],
+            "@dialogs": [
+                "src/dialogs"
+            ],
+            "@dialogs/*": [
+                "src/dialogs/*"
+            ],
+            "@forms": [
+                "src/forms"
+            ],
+            "@forms/*": [
+                "src/forms/*"
+            ],
             "@hooks": [
                 "src/hooks"
             ],
             "@hooks/*": [
                 "src/hooks/*"
+            ],
+            "@hocs": [
+                "src/hocs"
+            ],
+            "@hocs/*": [
+                "src/hocs/*"
+            ],
+            "@pages": [
+                "src/pages"
+            ],
+            "@pages/*": [
+                "src/pages/*"
+            ],
+            "@renderers": [
+                "src/renderers"
+            ],
+            "@renderers/*": [
+                "src/renderers/*"
             ],
             "@src": [
                 "src"

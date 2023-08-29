@@ -1,5 +1,5 @@
 import { isObject } from "@rosinfo.tech/utils";
-import type { IUser } from "@@types";
+import type { IUser, IUserFormCreate } from "@@types";
 import type { ContextStateFacade } from "./ContextStateFacade";
 
 export type TId = string;
@@ -35,19 +35,45 @@ export interface IStateRepository<D> {
 
 export type TDPStateRepository<D> = IDataProcessing<IStateRepository<D>>;
 
-export interface IContextStateProviderState {
-    repositoryUsers: TDPStateRepository<IUser> | null;
+interface ISubmittedForm<F> {
+    data: F;
+    timestamp: number;
 }
 
-export type TDataSet = ( stateNext: Partial<IContextStateProviderState> ) => void;
+export interface IStateForm<F, ERT = string> {
+    data: F;
+    errors: {
+        [k in keyof F]?: ERT;
+    } | null;
+    isSubmitting: boolean;
+    submitted: Array<ISubmittedForm<F>>;
+    touched: {
+        [k in keyof F]?: boolean;
+    };
+}
 
-export type TDataGet = () => IContextStateProviderState;
+export interface IContextStateDataForms {
+    userCreate: IStateForm<IUserFormCreate> | null;
+}
+
+export interface IContextStateDataRepositories {
+    users: TDPStateRepository<IUser> | null;
+}
+
+export interface IContextStateData {
+    forms: IContextStateDataForms;
+    repositories: IContextStateDataRepositories;
+}
+
+export type TDataSet = ( stateNext: Partial<IContextStateData> ) => void;
+
+export type TDataGet = () => IContextStateData;
 
 export interface IContextStateValue {
-    contextStateFacade: ContextStateFacade | null;
-    data: IContextStateProviderState;
+    data: IContextStateData;
     dataGet: TDataGet | null;
     dataSet: TDataSet | null;
+    stateFacade: ContextStateFacade | null;
 }
 
 export const isDataProcessing = <D>( value: unknown ): value is IDataProcessing<D> => !!value

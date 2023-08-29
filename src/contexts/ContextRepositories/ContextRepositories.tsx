@@ -1,5 +1,5 @@
 import { useContextAPI } from "@contexts/ContextAPI";
-import { contextStateFacade } from "@contexts/ContextState";
+import { stateFacade } from "@contexts/ContextState";
 import { createContext, useContext } from "react";
 import { RepositoryUsers } from "./repositories";
 import type { IContextRepositoriesProviderState, IContextRepositoriesValue } from "./types";
@@ -31,7 +31,7 @@ export const ContextRepositoriesProvider: FC<PropsWithChildren> = ( { children }
     const { repositoryUsers } = contextRepositoriesInitialValue;
 
     repositoryUsers.api = api;
-    repositoryUsers.contextStateFacade = contextStateFacade;
+    repositoryUsers.stateFacade = stateFacade;
 
     return (
         <ContextRepositories.Provider value={ contextRepositoriesInitialValue }>
