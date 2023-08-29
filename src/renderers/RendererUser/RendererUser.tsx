@@ -49,9 +49,7 @@ export const UserRenderer: FC<IUserRendererProps> = ( props ) => {
     }
 
     return (
-        <BoxStyledRendererUser
-            ref={ colorizeRenderRef }
-        >
+        <BoxStyledRendererUser ref={ colorizeRenderRef }>
             <Avatar sx={ sxMarginPaddingNo }>{user.login.split( "" )[ 0 ].toLocaleUpperCase()}</Avatar>
             <Typography component={ Box } sx={ sxMarginPaddingNo }>
                 {user.login}

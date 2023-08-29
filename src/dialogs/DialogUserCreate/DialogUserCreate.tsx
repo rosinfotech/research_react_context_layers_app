@@ -4,9 +4,7 @@ import { Box, Dialog, type DialogProps, Divider, IconButton, Typography } from "
 import type { FC } from "react";
 
 export const DialogUserCreate: FC<DialogProps> = props => (
-    <Dialog
-        { ...props }
-    >
+    <Dialog { ...props }>
         <Box
             alignItems="center"
             display="flex"
@@ -17,22 +15,13 @@ export const DialogUserCreate: FC<DialogProps> = props => (
             px={ 2 }
             py={ 0.5 }
         >
-            <Typography variant="h5" >
-                Creating user
-            </Typography>
-            <IconButton
-                color="secondary"
-                onClick={ props.onClose as VoidFunction }
-            >
+            <Typography variant="h5">Creating user</Typography>
+            <IconButton color="secondary" onClick={ props.onClose as VoidFunction }>
                 <CloseIcon />
             </IconButton>
         </Box>
         <Divider />
-        <Box
-            px={ 2 }
-            py={ 2 }
-            width="100%"
-        >
+        <Box px={ 2 } py={ 2 } width="100%">
             <FormUserCreate
                 onSubmitted={ async ( validationReturn ) => {
                     if ( validationReturn === true ) {

@@ -6,11 +6,10 @@ import type { TFormButtonSubmitProps } from "@contexts/ContextForms";
 import type { FC } from "react";
 
 // TODO Naming same in FormContext
-export const FormUserCreate: FC<Pick<TFormButtonSubmitProps<IUserFormCreate, typeof Button>, "onSubmitted">> = props => (
-    <Stack
-        direction="column"
-        spacing={ 1.5 }
-    >
+export const FormUserCreate: FC<
+Pick<TFormButtonSubmitProps<IUserFormCreate, typeof Button>, "onSubmitted">
+> = props => (
+    <Stack direction="column" spacing={ 1.5 }>
         <FormField<IUserFormCreate, typeof MUITextFieldFormFieldAdapted>
             Component={ MUITextFieldFormFieldAdapted }
             form="userCreate"
@@ -70,4 +69,3 @@ export const FormUserCreate: FC<Pick<TFormButtonSubmitProps<IUserFormCreate, typ
         </FormButtonSubmit>
     </Stack>
 );
-

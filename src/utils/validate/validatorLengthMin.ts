@@ -1,7 +1,9 @@
 import { replaceMessage } from "./helpers";
 import type { IValidatorConfigInternal, IValidatorLengthMinOptions } from "./types";
 
-export const validatorLengthMin = <I extends object>( options: IValidatorLengthMinOptions & IValidatorConfigInternal<I> ): string | true => {
+export const validatorLengthMin = <I extends object>(
+    options: IValidatorLengthMinOptions & IValidatorConfigInternal<I>,
+): string | true => {
     const { message, name, test, value } = options;
 
     if ( String( value ).length < Number( test ) ) {

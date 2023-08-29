@@ -42,9 +42,11 @@ interface ISubmittedForm<F> {
 
 export interface IStateForm<F, ERT = string> {
     data: F;
-    errors: {
+    errors:
+    | {
         [k in keyof F]?: ERT;
-    } | null;
+    }
+    | null;
     isSubmitting: boolean;
     submitted: Array<ISubmittedForm<F>>;
     touched: {

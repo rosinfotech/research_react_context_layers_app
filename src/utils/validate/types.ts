@@ -9,11 +9,11 @@ export type TValidator =
     | "NotNull"
     | "RegExp"
     | "Required";
-    // | "NotEmpty"
-    // | "LessThan"
-    // | "MoreThan";
+// | "NotEmpty"
+// | "LessThan"
+// | "MoreThan";
 
-export interface IValidatorConfigInternal <I extends object> {
+export interface IValidatorConfigInternal<I extends object> {
     message?: string;
     name?: keyof I;
     value?: I[keyof I];
@@ -35,12 +35,14 @@ export interface IValidatorConfigBaseNumber extends IValidatorConfigBase {
 }
 
 export interface IValidatorConfigBaseFunction extends IValidatorConfigBase {
-    test: ( value: unknown ) => ( string | true );
+    test: ( value: unknown ) => string | true;
     validator: TValidator;
 }
 
-export type TValidatorsMap <I extends object, VRS extends IValidatorConfigBase> = {
-    [ VR in VRS as VR["validator"] ]: VR["test"] | Omit<VR, "validator"> & IValidatorConfigInternal<I>;
+export type TValidatorsMap<I extends object, VRS extends IValidatorConfigBase> = {
+    [VR in VRS as VR["validator"]]:
+    | VR["test"]
+    | ( Omit<VR, "validator"> & IValidatorConfigInternal<I> );
 };
 
 export interface IValidatorFunctionOptions extends IValidatorConfigBaseFunction {
@@ -76,7 +78,9 @@ export interface IValidatorRequiredOptions extends IValidatorConfigBaseTrue {
     validator: "Required";
 }
 
-export type TValidatorsMapValues<I extends object> = Partial<TValidatorsMap<I,
+export type TValidatorsMapValues<I extends object> = Partial<
+TValidatorsMap<
+I,
 | IValidatorFunctionOptions
 | IValidatorEqualOptions
 | IValidatorLengthMaxOptions
@@ -84,20 +88,26 @@ export type TValidatorsMapValues<I extends object> = Partial<TValidatorsMap<I,
 | IValidatorNotNullOptions
 | IValidatorRegExpOptions
 | IValidatorRequiredOptions
->>;
+>
+>;
 
-export type TValidateReturn <I> = Record<keyof I, string> | true;
+export type TValidateReturn<I> = Record<keyof I, string> | true;
 
-export interface IValidateOptions <I extends object> {
+export interface IValidateOptions<I extends object> {
     scheme: {
         [k in keyof I]?: TValidatorsMapValues<I>;
     };
     values: I;
 }
 
-export type TValidatorOptions<I extends object> = Omit<IValidatorConfigBase & IValidatorConfigInternal<I>, "validator">;
+export type TValidatorOptions<I extends object> = Omit<
+IValidatorConfigBase & IValidatorConfigInternal<I>,
+"validator"
+>;
 
-export type TValidatorMap<I extends object> = Partial<Record<TValidator, ( options: TValidatorOptions<I> ) => string | true>>;
+export type TValidatorMap<I extends object> = Partial<
+Record<TValidator, ( options: TValidatorOptions<I> ) => string | true>
+>;
 
 export interface IReplaceMessageOptions {
     __NAME__?: unknown;

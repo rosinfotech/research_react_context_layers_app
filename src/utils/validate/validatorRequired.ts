@@ -1,7 +1,9 @@
 import { replaceMessage } from "./helpers";
 import type { IValidatorConfigInternal, IValidatorRequiredOptions } from "./types";
 
-export const validatorRequired = <I extends object>( options: IValidatorRequiredOptions & IValidatorConfigInternal<I> ): string | true => {
+export const validatorRequired = <I extends object>(
+    options: IValidatorRequiredOptions & IValidatorConfigInternal<I>,
+): string | true => {
     const { message, name, test, value } = options;
 
     if ( !value && !String( value ) ) {

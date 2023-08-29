@@ -7,16 +7,13 @@ export interface IMUITextFieldErrorAdaptedProps {
     error?: string;
 }
 
-export const MUITextFieldFormFieldAdapted: FC<Omit<TextFieldProps, "error"> & IMUITextFieldErrorAdaptedProps> = forwardRef( ( props, ref ) => {
+export const MUITextFieldFormFieldAdapted: FC<
+Omit<TextFieldProps, "error"> & IMUITextFieldErrorAdaptedProps
+> = forwardRef( ( props, ref ) => {
     const { error, ...rest } = props;
 
     return (
-        <TextField
-            { ...rest }
-            ref={ ref }
-            error={ !!error }
-            helperText={ !!error ? error : undefined }
-        />
+        <TextField { ...rest } ref={ ref } error={ !!error } helperText={ !!error ? error : undefined } />
     );
 } );
 

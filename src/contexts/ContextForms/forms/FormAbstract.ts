@@ -1,5 +1,9 @@
 import { ErrorCode, memoize } from "@rosinfo.tech/utils";
-import type { ContextStateFacade, IContextStateDataForms, IStateForm } from "@contexts/ContextState";
+import type {
+    ContextStateFacade,
+    IContextStateDataForms,
+    IStateForm,
+} from "@contexts/ContextState";
 import type { ChangeEvent } from "react";
 
 interface IFormAbstractConstructorOptions<E> {
@@ -16,10 +20,7 @@ export class FormAbstract<F, E, ERT = string> {
     private _submit: ( ( entity: E ) => Promise<void> ) | null = null;
 
     constructor ( options: IFormAbstractConstructorOptions<E> ) {
-        const {
-            stateForm,
-            submit = null,
-        } = options;
+        const { stateForm, submit = null } = options;
 
         this._stateForm = stateForm;
         this._submit = submit;
@@ -86,10 +87,7 @@ export class FormAbstract<F, E, ERT = string> {
     }
 
     public initialValuesGet = (): F => {
-        throw new ErrorCode(
-            "1908231651",
-            `Method "initialValuesGet" must be implemented`,
-        );
+        throw new ErrorCode( "1908231651", `Method "initialValuesGet" must be implemented` );
     };
 
     public isValid ( data: F ): boolean | IStateForm<F, ERT>["errors"] {
@@ -100,30 +98,33 @@ export class FormAbstract<F, E, ERT = string> {
     }
 
     // eslint-disable-next-line @typescript-eslint/member-ordering, @typescript-eslint/typedef
-    public onChangeEventGet = memoize( <E extends HTMLInputElement>( formField: keyof F ): ( e: ChangeEvent<E> ) => void => {
+    public onChangeEventGet = memoize(
+        <E extends HTMLInputElement>( formField: keyof F ): ( ( e: ChangeEvent<E> ) => void ) => {
+            this.isInitializedException();
 
-        this.isInitializedException();
-
-        return ( e ) => {
-            this.stateFacade?.formValueSet<F>( {
-                formField,
-                initialValuesGet: this.initialValuesGet,
-                stateForm       : this._stateForm as keyof IContextStateDataForms,
-                value           : e.target.value as F[ keyof F ],
-            } );
-        };
-    } );
+            return ( e ) => {
+                this.stateFacade?.formValueSet<F>( {
+                    formField,
+                    initialValuesGet: this.initialValuesGet,
+                    stateForm       : this._stateForm as keyof IContextStateDataForms,
+                    value           : e.target.value as F[keyof F],
+                } );
+            };
+        },
+    );
 
     public formDataToEntityAdapter ( data: F ) {
         return data as unknown as E;
     }
 
     // TODO Concerns about promisify
-    public async onSubmit ( onSubmitted?: ( validationReturn: boolean | IStateForm<F, ERT>["errors"] ) => Promise<void> ) {
-
+    public async onSubmit (
+        onSubmitted?: ( validationReturn: boolean | IStateForm<F, ERT>["errors"] ) => Promise<void>,
+    ) {
         this.isInitializedException();
 
-        return this.stateFacade?.formDataSubmit<F, E, ERT>( {
+        return this.stateFacade
+            ?.formDataSubmit<F, E, ERT>( {
             formDataIsValid        : this.isValid,
             formDataToEntityAdapter: this.formDataToEntityAdapter,
             initialValuesGet       : this.initialValuesGet,
@@ -131,8 +132,8 @@ export class FormAbstract<F, E, ERT = string> {
             stateForm              : this.stateForm,
             // @ts-expect-error Not null
             submit                 : this.submit,
-        } ).then( async validationReturn => onSubmitted?.( validationReturn ) );
-
+        } )
+            .then( async validationReturn => onSubmitted?.( validationReturn ) );
     }
 
     // // TODO Concerns about promisify

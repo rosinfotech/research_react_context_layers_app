@@ -27,8 +27,6 @@ export const ContextFormsProvider: FC<PropsWithChildren> = ( { children } ) => {
     userCreate.submit = repositoryUsers.create;
 
     return (
-        <ContextForms.Provider value={ contextFormsInitialValue }>
-            {children}
-        </ContextForms.Provider>
+        <ContextForms.Provider value={ contextFormsInitialValue }>{children}</ContextForms.Provider>
     );
 };

@@ -17,14 +17,10 @@ export class FormUserCreate extends FormAbstract<IUserFormCreate, IUser> {
         password       : "",
         passwordConfirm: "",
         surname        : "",
-    } as IUserFormCreate );
+    } ) as IUserFormCreate;
 
     public formDataToEntityAdapter ( data: IUserFormCreate ) {
-        const {
-            email,
-            login,
-            surname,
-        } = data;
+        const { email, login, surname } = data;
 
         return {
             email,
@@ -34,7 +30,6 @@ export class FormUserCreate extends FormAbstract<IUserFormCreate, IUser> {
     }
 
     public isValid ( formData: IUserFormCreate ) {
-
         return validate( {
             scheme: {
                 email: {
@@ -58,7 +53,6 @@ export class FormUserCreate extends FormAbstract<IUserFormCreate, IUser> {
             },
             values: formData,
         } );
-
     }
 
 }

@@ -35,7 +35,7 @@ interface IFormValueSetOptions<F, N extends keyof F = keyof F> {
     formField: N;
     initialValuesGet: () => F;
     stateForm: keyof IContextStateDataForms;
-    value: F[ N ];
+    value: F[N];
 }
 
 interface IFormDataSubmitOptions<F, E, ERT> {
@@ -178,7 +178,6 @@ export class ContextStateFacade {
                 [ stateRepositoryName ]: stateRepository,
             },
         } );
-
     }
 
     public async stateRepositoryEntitiesListGet<E>( options: IStateRepositoryEntitiesGetOptions<E> ) {
@@ -254,16 +253,11 @@ export class ContextStateFacade {
     }
 
     public formInitialValuesSet<F>( options: IFormInitialValuesSetOptions<F> ) {
-
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "1908231722" );
         }
 
-        const {
-            force,
-            initialValuesGet,
-            stateForm,
-        } = options;
+        const { force, initialValuesGet, stateForm } = options;
 
         const state = this.dataGet();
 
@@ -278,21 +272,14 @@ export class ContextStateFacade {
                 [ stateForm ]: ContextStateFacade.formGenerate( initialValuesGet() ),
             },
         } );
-
     }
 
     public formValueSet<F>( options: IFormValueSetOptions<F> ) {
-
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "1908231722" );
         }
 
-        const {
-            formField,
-            initialValuesGet,
-            stateForm,
-            value,
-        } = options;
+        const { formField, initialValuesGet, stateForm, value } = options;
 
         this.formInitialValuesSet<F>( {
             initialValuesGet,
@@ -316,7 +303,6 @@ export class ContextStateFacade {
         state.forms[ stateForm ].data = { ...data };
 
         this.dataSet( state );
-
     }
 
     // public formDataGet <F>( stateForm: keyof IContextStateDataForms ) {
@@ -336,19 +322,15 @@ export class ContextStateFacade {
     //     return data as F | undefined;
     // }
 
-    public async formDataSubmit <F, E, ERT>( options: IFormDataSubmitOptions<F, E, ERT> ): Promise<boolean | IStateForm<F, ERT>["errors"]> {
-
+    public async formDataSubmit<F, E, ERT>(
+        options: IFormDataSubmitOptions<F, E, ERT>,
+    ): Promise<boolean | IStateForm<F, ERT>["errors"]> {
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "2208231604" );
         }
 
-        const {
-            formDataIsValid,
-            formDataToEntityAdapter,
-            initialValuesGet,
-            stateForm,
-            submit,
-        } = options;
+        const { formDataIsValid, formDataToEntityAdapter, initialValuesGet, stateForm, submit }
+            = options;
 
         const state = this.dataGet();
 
@@ -367,7 +349,6 @@ export class ContextStateFacade {
         const validationResult = formDataIsValid( data );
 
         if ( isBoolean( validationResult ) && validationResult ) {
-
             // @ts-expect-error Not null
             state.forms[ stateForm ].errors = null;
 

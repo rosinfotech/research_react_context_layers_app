@@ -34,8 +34,8 @@ export const PageIndex: FC = () => {
                     ReactElementRenderer={ UserRenderer }
                     repositoryClass={ repositoryUsers }
                 />
-                <BoxStyledRendererUser ref={ colorizeRenderRef } >
-                    <IconButtonOpen size="large" >
+                <BoxStyledRendererUser ref={ colorizeRenderRef }>
+                    <IconButtonOpen size="large">
                         <AddCircleIcon />
                     </IconButtonOpen>
                 </BoxStyledRendererUser>

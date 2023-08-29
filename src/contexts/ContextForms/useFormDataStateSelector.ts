@@ -7,9 +7,7 @@ export interface IUseFormDataStateSelectorOptions {
 export const useFormDataStateSelector = ( options: IUseFormDataStateSelectorOptions ) => {
     const { stateForm } = options;
 
-    const formData = useContextStateSelector(
-        state => state.data.forms[ stateForm ]?.data,
-    );
+    const formData = useContextStateSelector( state => state.data.forms[ stateForm ]?.data );
 
     return formData;
 };
