@@ -1,4 +1,4 @@
-import { RepositoryViewListEntities, useContextRepositories } from "@contexts/ContextRepositories";
+import { RepositoryViewList, useContextRepositories } from "@contexts/ContextRepositories";
 import { DialogUserCreate } from "@dialogs/DialogUserCreate";
 import { useButtonOpen } from "@hooks";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -30,9 +30,9 @@ export const PageIndex: FC = () => {
                 justifyContent="flex-start"
                 width="100%"
             >
-                <RepositoryViewListEntities<IUser>
+                <RepositoryViewList<IUser>
                     ReactElementRenderer={ UserRenderer }
-                    repositoryClass={ repositoryUsers }
+                    repository={ repositoryUsers }
                 />
                 <BoxStyledRendererUser ref={ colorizeRenderRef }>
                     <IconButtonOpen size="large">

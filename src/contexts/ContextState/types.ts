@@ -14,6 +14,7 @@ export interface IDataProcessing<D> {
     isError?: boolean;
     isFetched?: boolean;
     isFetching?: boolean;
+    isOutdated?: boolean;
     timestamp: number;
 }
 
@@ -40,11 +41,11 @@ interface ISubmittedForm<F> {
     timestamp: number;
 }
 
-export interface IStateForm<F, ERT = string> {
+export interface IStateForm<F> {
     data: F;
     errors:
     | {
-        [k in keyof F]?: ERT;
+        [k in keyof F]?: string;
     }
     | null;
     isSubmitting: boolean;
@@ -54,17 +55,17 @@ export interface IStateForm<F, ERT = string> {
     };
 }
 
-export interface IContextStateDataForms {
-    userCreate: IStateForm<IUserFormCreate> | null;
+export interface IContextStateForms {
+    formUserCreate: IStateForm<IUserFormCreate> | null;
 }
 
-export interface IContextStateDataRepositories {
-    users: TDPStateRepository<IUser> | null;
+export interface IContextStateRepositories {
+    repositoryUsers: TDPStateRepository<IUser> | null;
 }
 
 export interface IContextStateData {
-    forms: IContextStateDataForms;
-    repositories: IContextStateDataRepositories;
+    forms: IContextStateForms;
+    repositories: IContextStateRepositories;
 }
 
 export type TDataSet = ( stateNext: Partial<IContextStateData> ) => void;

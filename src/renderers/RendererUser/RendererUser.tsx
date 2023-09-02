@@ -4,8 +4,8 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { Avatar, Box, IconButton, Typography, styled } from "@mui/material";
 import { useColorizeRender } from "@rosinfo.tech/react";
 import { ErrorCode } from "@rosinfo.tech/utils";
+import { type FC, memo } from "react";
 import type { SxProps } from "@mui/material";
-import type { FC } from "react";
 
 interface IUserRendererProps {
     id: TId;
@@ -30,7 +30,7 @@ export const BoxStyledRendererUser = styled( Box )( {
     width         : 128,
 } );
 
-export const UserRenderer: FC<IUserRendererProps> = ( props ) => {
+export const UserRenderer: FC<IUserRendererProps> = memo( ( props ) => {
     const { id } = props;
 
     const { colorizeRenderRef } = useColorizeRender( {
@@ -39,7 +39,7 @@ export const UserRenderer: FC<IUserRendererProps> = ( props ) => {
     } );
 
     const user = useContextStateSelector(
-        state => state.data.repositories.users?.data?.entities[ id ]?.data,
+        state => state.data.repositories.repositoryUsers?.data?.entities[ id ]?.data,
     );
 
     const { repositoryUsers } = useContextRepositories();
@@ -52,13 +52,16 @@ export const UserRenderer: FC<IUserRendererProps> = ( props ) => {
         <BoxStyledRendererUser ref={ colorizeRenderRef }>
             <Avatar sx={ sxMarginPaddingNo }>{user.login.split( "" )[ 0 ].toLocaleUpperCase()}</Avatar>
             <Typography component={ Box } sx={ sxMarginPaddingNo }>
+                {user.id}
+            </Typography>
+            <Typography component={ Box } sx={ sxMarginPaddingNo }>
                 {user.login}
             </Typography>
             <IconButton
                 component={ Box }
                 sx={ sxMarginPaddingNo }
                 onClick={ () => {
-                    repositoryUsers.entityDelete( id ).catch( ( e ) => {
+                    repositoryUsers.delete( id ).catch( ( e ) => {
                         throw new ErrorCode( "1608231319", e );
                     } );
                 } }
@@ -67,4 +70,6 @@ export const UserRenderer: FC<IUserRendererProps> = ( props ) => {
             </IconButton>
         </BoxStyledRendererUser>
     );
-};
+} );
+
+UserRenderer.displayName = "UserRenderer";

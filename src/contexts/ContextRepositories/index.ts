@@ -1,2 +1,2 @@
-export * from "./RepositoryViewListEntities";
+export * from "./components";
 export * from "./ContextRepositories";

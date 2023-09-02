@@ -1,12 +1,12 @@
-import { type IContextStateDataForms, useContextStateSelector } from "@contexts/ContextState";
+import { type IContextStateForms, useContextStateSelector } from "@contexts/ContextState";
 
-export interface IUseFormErrorsFieldStateSelectorOptions<F> {
+export interface IUseStateSelectorFormErrorsFieldOptions<F> {
     formField: keyof F;
-    stateForm: keyof IContextStateDataForms;
+    stateForm: keyof IContextStateForms;
 }
 
-export const useFormErrorsFieldStateSelector = <F>(
-    options: IUseFormErrorsFieldStateSelectorOptions<F>,
+export const useStateSelectorFormErrorsField = <F>(
+    options: IUseStateSelectorFormErrorsFieldOptions<F>,
 ) => {
     const { formField, stateForm } = options;
 

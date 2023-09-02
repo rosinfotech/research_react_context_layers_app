@@ -9,10 +9,10 @@ export const stateFacade = new ContextStateFacade();
 
 const contextStateInitialState: IContextStateData = {
     forms: {
-        userCreate: null,
+        formUserCreate: null,
     },
     repositories: {
-        users: null,
+        repositoryUsers: null,
     },
 };
 

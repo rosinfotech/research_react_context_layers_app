@@ -6,7 +6,7 @@ import type { IContextFormsProviderState, TContextFormsValue } from "./types";
 import type { FC, PropsWithChildren } from "react";
 
 const contextFormsInitialState: IContextFormsProviderState = {
-    userCreate: new FormUserCreate(),
+    formUserCreate: new FormUserCreate(),
 };
 
 const contextFormsInitialValue: IContextFormsProviderState = {
@@ -20,11 +20,11 @@ export function useContextForms (): TContextFormsValue {
 }
 
 export const ContextFormsProvider: FC<PropsWithChildren> = ( { children } ) => {
-    const { userCreate } = contextFormsInitialValue;
+    const { formUserCreate } = contextFormsInitialValue;
     const { repositoryUsers } = useContextRepositories();
 
-    userCreate.stateFacade = stateFacade;
-    userCreate.submit = repositoryUsers.create;
+    formUserCreate.stateFacade = stateFacade;
+    formUserCreate.submit = repositoryUsers.create;
 
     return (
         <ContextForms.Provider value={ contextFormsInitialValue }>{children}</ContextForms.Provider>

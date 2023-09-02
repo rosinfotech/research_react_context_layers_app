@@ -1,7 +1,7 @@
 import { MUITextFieldFormFieldAdapted } from "@components/MUITextFieldFormFieldAdapted";
-import { FormButtonSubmit, FormField } from "@contexts/ContextForms";
+import { FormButtonReset, FormButtonSubmit, FormField } from "@contexts/ContextForms";
 import { Box, Button, Divider, Stack } from "@mui/material";
-import type { IUserFormCreate } from "@@types";
+import type { IUser, IUserFormCreate } from "@@types";
 import type { TFormButtonSubmitProps } from "@contexts/ContextForms";
 import type { FC } from "react";
 
@@ -10,31 +10,31 @@ export const FormUserCreate: FC<
 Pick<TFormButtonSubmitProps<IUserFormCreate, typeof Button>, "onSubmitted">
 > = props => (
     <Stack direction="column" spacing={ 1.5 }>
-        <FormField<IUserFormCreate, typeof MUITextFieldFormFieldAdapted>
+        <FormField<IUserFormCreate, IUser, typeof MUITextFieldFormFieldAdapted>
             Component={ MUITextFieldFormFieldAdapted }
-            form="userCreate"
+            form="formUserCreate"
             formField="login"
             label="Login"
             fullWidth
         />
-        <FormField<IUserFormCreate, typeof MUITextFieldFormFieldAdapted>
+        <FormField<IUserFormCreate, IUser, typeof MUITextFieldFormFieldAdapted>
             Component={ MUITextFieldFormFieldAdapted }
-            form="userCreate"
+            form="formUserCreate"
             formField="email"
             label="Email"
             type="email"
             fullWidth
         />
-        <FormField<IUserFormCreate, typeof MUITextFieldFormFieldAdapted>
+        <FormField<IUserFormCreate, IUser, typeof MUITextFieldFormFieldAdapted>
             Component={ MUITextFieldFormFieldAdapted }
-            form="userCreate"
+            form="formUserCreate"
             formField="name"
             label="Name"
             fullWidth
         />
-        <FormField<IUserFormCreate, typeof MUITextFieldFormFieldAdapted>
+        <FormField<IUserFormCreate, IUser, typeof MUITextFieldFormFieldAdapted>
             Component={ MUITextFieldFormFieldAdapted }
-            form="userCreate"
+            form="formUserCreate"
             formField="surname"
             label="Surname"
             fullWidth
@@ -42,16 +42,16 @@ Pick<TFormButtonSubmitProps<IUserFormCreate, typeof Button>, "onSubmitted">
         <Box py={ 2 } width="100%">
             <Divider />
         </Box>
-        <FormField<IUserFormCreate, typeof MUITextFieldFormFieldAdapted>
+        <FormField<IUserFormCreate, IUser, typeof MUITextFieldFormFieldAdapted>
             Component={ MUITextFieldFormFieldAdapted }
-            form="userCreate"
+            form="formUserCreate"
             formField="password"
             label="Password"
             fullWidth
         />
-        <FormField<IUserFormCreate, typeof MUITextFieldFormFieldAdapted>
+        <FormField<IUserFormCreate, IUser, typeof MUITextFieldFormFieldAdapted>
             Component={ MUITextFieldFormFieldAdapted }
-            form="userCreate"
+            form="formUserCreate"
             formField="passwordConfirm"
             label="Password confirm"
             fullWidth
@@ -59,13 +59,31 @@ Pick<TFormButtonSubmitProps<IUserFormCreate, typeof Button>, "onSubmitted">
         <Box py={ 2 } width="100%">
             <Divider />
         </Box>
-        <FormButtonSubmit<IUserFormCreate, typeof Button>
-            Component={ Button }
-            color="primary"
-            form="userCreate"
-            onSubmitted={ props.onSubmitted }
+        <Box
+            alignContent="center"
+            display="flex"
+            flexDirection="row"
+            flexWrap="nowrap"
+            justifyContent="flex-start"
+            width="100%"
         >
-            Create
-        </FormButtonSubmit>
+            <FormButtonReset<IUserFormCreate, IUser, typeof Button>
+                Component={ Button }
+                color="primary"
+                form="formUserCreate"
+                fullWidth
+            >
+                Reset
+            </FormButtonReset>
+            <FormButtonSubmit<IUserFormCreate, IUser, typeof Button>
+                Component={ Button }
+                color="primary"
+                form="formUserCreate"
+                fullWidth
+                onSubmitted={ props.onSubmitted }
+            >
+                Create
+            </FormButtonSubmit>
+        </Box>
     </Stack>
 );

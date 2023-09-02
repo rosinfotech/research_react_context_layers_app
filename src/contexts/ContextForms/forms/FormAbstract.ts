@@ -1,29 +1,29 @@
 import { ErrorCode, memoize } from "@rosinfo.tech/utils";
-import type {
-    ContextStateFacade,
-    IContextStateDataForms,
-    IStateForm,
-} from "@contexts/ContextState";
+import type { ContextStateFacade, IContextStateForms, IStateForm } from "@contexts/ContextState";
 import type { ChangeEvent } from "react";
 
-interface IFormAbstractConstructorOptions<E> {
-    stateForm: keyof IContextStateDataForms;
-    submit?: ( entity: E ) => Promise<void>;
-}
+export class FormAbstract<F, E> {
 
-export class FormAbstract<F, E, ERT = string> {
+    public formFieldOnChangeEventGet: <H extends HTMLInputElement>(
+        formField: keyof F
+    ) => ( e: ChangeEvent<H> ) => void;
+
+    protected _stateForm: keyof IContextStateForms | null = null;
 
     private _stateFacade: ContextStateFacade | null = null;
 
-    private _stateForm: keyof IContextStateDataForms | null = null;
+    private _submit: ( ( entity: E ) => Promise<E> ) | null = null;
 
-    private _submit: ( ( entity: E ) => Promise<void> ) | null = null;
-
-    constructor ( options: IFormAbstractConstructorOptions<E> ) {
-        const { stateForm, submit = null } = options;
-
-        this._stateForm = stateForm;
-        this._submit = submit;
+    constructor () {
+        this.formDataToEntityAdapter = this.formDataToEntityAdapter.bind( this );
+        this.valuesInitial = this.valuesInitial.bind( this );
+        this.valuesInitialGet = this.valuesInitialGet.bind( this );
+        this.isInitialized = this.isInitialized.bind( this );
+        this.isInitializedException = this.isInitializedException.bind( this );
+        this.isValid = this.isValid.bind( this );
+        this.formFieldOnChangeEventGet = memoize( this._formFieldOnChangeEventGet.bind( this ) );
+        this.onSubmit = this.onSubmit.bind( this );
+        this.onReset = this.onReset.bind( this );
     }
 
     // eslint-disable-next-line @typescript-eslint/member-ordering
@@ -37,30 +37,31 @@ export class FormAbstract<F, E, ERT = string> {
 
     // eslint-disable-next-line @typescript-eslint/member-ordering
     public get stateForm () {
-        return this._stateForm;
-    }
+        this.isInitializedException();
 
-    public set stateForm ( stateForm: keyof IContextStateDataForms | null ) {
-        this._stateForm = stateForm;
+        return this._stateForm as keyof IContextStateForms;
     }
 
     // eslint-disable-next-line @typescript-eslint/member-ordering
     public get submit () {
+        this.stateFacade?.isInitializedException();
+
         return this._submit;
     }
 
-    public set submit ( submit: ( ( entity: E ) => Promise<void> ) | null ) {
-        this._submit = submit;
+    public set submit ( submit: ( ( entity: E ) => Promise<E> ) | null ) {
+        this._submit = !!submit ? submit.bind( this ) : submit;
     }
 
-    public initialValues () {
+    public valuesInitial ( force?: boolean ) {
         if ( !this._stateForm ) {
             return false;
         }
 
-        this.stateFacade?.formInitialValuesSet( {
-            initialValuesGet: this.initialValuesGet,
+        this.stateFacade?.formValuesInitialSet<F>( {
+            force,
             stateForm       : this._stateForm,
+            valuesInitialGet: this.valuesInitialGet,
         } );
 
         return true;
@@ -70,7 +71,7 @@ export class FormAbstract<F, E, ERT = string> {
         const isInitialized = !!this._stateFacade && !!this._stateForm && !!this.submit;
 
         if ( isInitialized ) {
-            this.initialValues();
+            this.valuesInitial();
         }
 
         return isInitialized;
@@ -86,32 +87,16 @@ export class FormAbstract<F, E, ERT = string> {
         return true;
     }
 
-    public initialValuesGet = (): F => {
-        throw new ErrorCode( "1908231651", `Method "initialValuesGet" must be implemented` );
-    };
+    public valuesInitialGet (): F {
+        throw new ErrorCode( "1908231651", `Method "valuesInitialGet" must be implemented` );
+    }
 
-    public isValid ( data: F ): boolean | IStateForm<F, ERT>["errors"] {
+    public isValid ( data: F ): boolean | IStateForm<F>["errors"] {
         throw new ErrorCode(
             "2208231522",
             `Method "isValid" must be implemented. Called with <${ JSON.stringify( data ) }>`,
         );
     }
-
-    // eslint-disable-next-line @typescript-eslint/member-ordering, @typescript-eslint/typedef
-    public onChangeEventGet = memoize(
-        <E extends HTMLInputElement>( formField: keyof F ): ( ( e: ChangeEvent<E> ) => void ) => {
-            this.isInitializedException();
-
-            return ( e ) => {
-                this.stateFacade?.formValueSet<F>( {
-                    formField,
-                    initialValuesGet: this.initialValuesGet,
-                    stateForm       : this._stateForm as keyof IContextStateDataForms,
-                    value           : e.target.value as F[keyof F],
-                } );
-            };
-        },
-    );
 
     public formDataToEntityAdapter ( data: F ) {
         return data as unknown as E;
@@ -119,39 +104,39 @@ export class FormAbstract<F, E, ERT = string> {
 
     // TODO Concerns about promisify
     public async onSubmit (
-        onSubmitted?: ( validationReturn: boolean | IStateForm<F, ERT>["errors"] ) => Promise<void>,
+        onSubmitted?: ( validationReturn: boolean | IStateForm<F>["errors"] ) => Promise<void>,
     ) {
         this.isInitializedException();
 
         return this.stateFacade
-            ?.formDataSubmit<F, E, ERT>( {
+            ?.formSubmit<F, E>( {
             formDataIsValid        : this.isValid,
             formDataToEntityAdapter: this.formDataToEntityAdapter,
-            initialValuesGet       : this.initialValuesGet,
-            // @ts-expect-error Not null
             stateForm              : this.stateForm,
             // @ts-expect-error Not null
             submit                 : this.submit,
+            valuesInitialGet       : this.valuesInitialGet,
         } )
             .then( async validationReturn => onSubmitted?.( validationReturn ) );
     }
 
-    // // TODO Concerns about promisify
-    // // eslint -disable-next-line @typescript-eslint/member-ordering, @typescript-eslint/typedef
-    // public onSubmit = async ( onSubmitted?: ( validationReturn: boolean | IStateForm<F, ERT>["errors"] ) => Promise<void> ) => {
+    public onReset () {
+        this.valuesInitial( true );
+    }
 
-    //     this.isInitializedException();
+    private _formFieldOnChangeEventGet<H extends HTMLInputElement>(
+        formField: keyof F,
+    ): ( e: ChangeEvent<H> ) => void {
+        this.isInitializedException();
 
-    //     return this.stateFacade?.formDataSubmit<F, E, ERT>( {
-    //         formDataIsValid        : this.isValid,
-    //         formDataToEntityAdapter: this.formDataToEntityAdapter,
-    //         initialValuesGet       : this.initialValuesGet,
-    //         // @ts-expect-error Not null
-    //         stateForm              : this.stateForm,
-    //         // @ts-expect-error Not null
-    //         submit                 : this.submit,
-    //     } ).then( async validationReturn => onSubmitted?.( validationReturn ) );
-
-    // };
+        return ( e ) => {
+            this.stateFacade?.formFieldValueSet<F>( {
+                formField,
+                stateForm       : this._stateForm as keyof IContextStateForms,
+                value           : e.target.value as F[keyof F],
+                valuesInitialGet: this.valuesInitialGet,
+            } );
+        };
+    }
 
 }

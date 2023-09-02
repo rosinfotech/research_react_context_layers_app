@@ -1,4 +1,5 @@
-import { isError, isObject } from "@rosinfo.tech/utils";
+import { isObject } from "@rosinfo.tech/utils";
+import { errorPDOExtract } from "@utils/errorPDOExtract";
 import type { CSSProperties, FC } from "react";
 
 export interface IErrorBoundaryFailBackProps {
@@ -19,6 +20,8 @@ const stylePreDefault: CSSProperties = {
 export const ErrorBoundaryFailBack: FC<IErrorBoundaryFailBackProps> = ( props ) => {
     const { error, info } = props;
 
+    const errorPDO = errorPDOExtract( error );
+
     return (
         <div
             style={ {
@@ -34,16 +37,15 @@ export const ErrorBoundaryFailBack: FC<IErrorBoundaryFailBackProps> = ( props ) 
             } }
         >
             <h1 style={ styleDefault }>Error</h1>
-            {isError( error ) ? (
-                <>
-                    <h2 style={ styleDefault }>{String( error.stack )}</h2>
-                    <pre style={ stylePreDefault }>{error.message.replace( /\\n/g, "\n" )}</pre>
-                </>
-            )
-                : <h2 style={ styleDefault }>{String( error )}</h2>}
+            {!!errorPDO.message && <h2 style={ styleDefault }>{String( errorPDO.message )}</h2>}
+            {!!errorPDO.stack && (
+                <pre style={ stylePreDefault }>
+                    {String( ( ( errorPDO.stack ?? "" ) as string ).replace( /\\n/g, "\n" ) )}
+                </pre>
+            )}
             {isObject( info )
-                ? <pre style={ stylePreDefault }>{JSON.stringify( info ).replace( /\\n/g, "\n" )}</pre>
-                : <h2 style={ styleDefault }>{String( info )}</h2>}
+                && <pre style={ stylePreDefault }>{JSON.stringify( info ).replace( /\\n/g, "\n" )}</pre>}
+            {!!info && <h2 style={ styleDefault }>{String( info )}</h2>}
         </div>
     );
 };

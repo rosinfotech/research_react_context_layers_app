@@ -1,9 +1,13 @@
 import { ErrorCode, isBoolean, objectClone } from "@rosinfo.tech/utils";
-import { DEFAULT_PARAMS_STRING } from "./constants";
+import {
+    DEFAULT_PARAMS_STRING,
+    TIMESTAMP_CODE_NEED_UPDATE,
+    TIME_OBSOLESCENCE_MS,
+} from "./constants";
 import { isTDPStateRepository } from "./types";
 import type {
-    IContextStateDataForms,
-    IContextStateDataRepositories,
+    IContextStateForms,
+    IContextStateRepositories,
     IDataProcessing,
     IStateForm,
     TDPStateRepository,
@@ -13,47 +17,45 @@ import type {
     TId,
 } from "./types";
 
-interface IStateRepositoryEntitiesGetOptions<E> {
-    entitiesListAPI: () => Promise<Array<E>>;
+interface IRepositoryListGetOptions<E> {
     idField: keyof E;
-    stateRepositoryName: keyof IContextStateDataRepositories;
+    listGetAPI: () => Promise<Array<E>>;
+    stateRepository: keyof IContextStateRepositories;
 }
 
-interface IStateRepositoryEntityDeleteOptions {
-    entityDeleteAPI: ( id: TId ) => Promise<void>;
+interface IRepositoryDeleteOptions {
+    deleteAPI: ( id: TId ) => Promise<void>;
     id: TId;
-    stateRepositoryName: keyof IContextStateDataRepositories;
+    stateRepository: keyof IContextStateRepositories;
 }
 
-interface IFormInitialValuesSetOptions<F> {
+interface IRepositoryCreateOptions<E> {
+    createAPI: ( data: E ) => Promise<E>;
+    data: E;
+    idField: keyof E;
+    stateRepository: keyof IContextStateRepositories;
+}
+
+interface IFormValuesInitialSetOptions<F> {
     force?: boolean;
-    initialValuesGet: () => F;
-    stateForm: keyof IContextStateDataForms;
+    stateForm: keyof IContextStateForms;
+    valuesInitialGet: () => F;
 }
 
-interface IFormValueSetOptions<F, N extends keyof F = keyof F> {
+interface IFormFieldValueSetOptions<F, N extends keyof F = keyof F> {
     formField: N;
-    initialValuesGet: () => F;
-    stateForm: keyof IContextStateDataForms;
+    stateForm: keyof IContextStateForms;
     value: F[N];
+    valuesInitialGet: () => F;
 }
 
-interface IFormDataSubmitOptions<F, E, ERT> {
-    formDataIsValid: ( data: F ) => boolean | IStateForm<F, ERT>["errors"];
+interface IFormDataSubmitOptions<F, E> {
+    formDataIsValid: ( data: F ) => boolean | IStateForm<F>["errors"];
     formDataToEntityAdapter: ( entity: F ) => E;
-    initialValuesGet: () => F;
-    stateForm: keyof IContextStateDataForms;
+    stateForm: keyof IContextStateForms;
     submit: ( entity: E ) => Promise<void>;
+    valuesInitialGet: () => F;
 }
-
-// interface IFormValueSetOptions<F> {
-//     formField: keyof F;
-//     initialValuesGet: () => F;
-//     stateForm: keyof IContextStateDataForms;
-//     value: F[keyof F];
-// }
-
-// https://www.typescriptlang.org/play?#code/JYOwLgpgTgZghgYwgAgJIDFhQM5mQbwChlk4AuZXKUAcwG5jkAjCkAVwFsnoGSEKmAe0EAbCHBAMAvoQSCQuZDCy4KGFXgC8BRiXLIA5HAMAaXcwoAmMyT4UwUNhDNSGhUJFiIUqAMoQ5EAATAB4AaQgAT2QIAA9IYOxkAGsowRg0TBwtFLSM9WyAPh0SEDgOCAB5GEwIESD0KEEOLNVkCMjeZDkoKAhsAAd5INoAFUiBqpgANTgRJ2ra+oBBIQA3CDVWsABtDoBdaUJCGDYQBDBgeWQwQX9A0I6Y+IhE3Mj0zI1CgAplbK2GhM7woHQAlGp7sNwlFikRbMg+mA2FAQCUEbYyhVFsA6g0mi0NBRUpEbBi+IJev0hsExhMprN5lMlkFVoINhR-rgdiT9mSSK5CDITmcLlc0dgAsMAEJ1eQ0bCjQQdGHROIJIJJEmfAq4X6Sh6QqXBYEk0FRCGUY1BZDAJJ+a2quHmJEoiXWgB0WOZuPqjWa22QmmD7yOsnkihJSW0OyMpkMCHjBiYBn2pCSZ2SIEEAHc0XAkj9tfltmCdodwwo8AbhkGbndrX8ge9sDsAIz7MEMYAZH414KykTyxXKqJ963AgyJsFg9EUhSiCAeoc0ccPD09PqDYZ0ybVRkLGq+1nrCBd8wAegv5JvCIAegB+IVAA
 
 export class ContextStateFacade {
 
@@ -78,8 +80,8 @@ export class ContextStateFacade {
         this._dataSet = dataSet;
     }
 
-    public static formGenerate = <F>( initialValues: F ): IStateForm<F> => ( {
-        data        : objectClone( initialValues ),
+    public static formGenerate = <F>( valuesInitial: F ): IStateForm<F> => ( {
+        data        : objectClone( valuesInitial ),
         errors      : null,
         isSubmitting: false,
         submitted   : [],
@@ -92,10 +94,41 @@ export class ContextStateFacade {
         isError   : false,
         isFetched : false,
         isFetching: false,
+        isOutdated: false,
         timestamp : Date.now(),
     } );
 
-    public static stateRepositoryGenerate = <E>(): TDPStateRepository<E> => ( {
+    public static isOutdated<E, DPE extends IDataProcessing<E>>(
+        structure: DPE,
+        timeObsolescenceMs: number = TIME_OBSOLESCENCE_MS,
+    ): boolean {
+        if ( structure.isOutdated ) {
+            return true;
+        }
+        if ( !structure.timestamp ) {
+            throw new ErrorCode( "0109232123" );
+        }
+        const timestampCurrent = Date.now();
+        if ( timestampCurrent - structure.timestamp > timeObsolescenceMs ) {
+            return true;
+        }
+        return false;
+    }
+
+    public static isReplaceDataInDPStructureNeeded<
+        E,
+        DPE extends IDataProcessing<E> = IDataProcessing<any>,
+    >( structure: DPE, dataNew: E ): boolean {
+        if (
+            JSON.stringify( structure.data ) !== JSON.stringify( dataNew )
+            || ContextStateFacade.isOutdated<E, DPE>( structure )
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public static repositoryGenerate = <E>(): TDPStateRepository<E> => ( {
         ...ContextStateFacade.dataProcessingGenerate<E>(),
         data: {
             entities: {},
@@ -115,16 +148,15 @@ export class ContextStateFacade {
         return true;
     }
 
-    public async stateRepositoryEntityDelete<E>( options: IStateRepositoryEntityDeleteOptions ) {
+    public async repositoryCreate<E>( options: IRepositoryCreateOptions<E> ) {
         if ( !this.dataGet || !this.dataSet ) {
-            throw new ErrorCode( "1508231755" );
+            throw new ErrorCode( "0109231818" );
         }
-
-        const { entityDeleteAPI, id, stateRepositoryName } = options;
+        const { createAPI, data, idField, stateRepository: stateRepositoryKey } = options;
 
         const state = this.dataGet();
 
-        const stateRepository = state.repositories[ stateRepositoryName ];
+        const stateRepository = state.repositories[ stateRepositoryKey ];
 
         if ( !isTDPStateRepository<E>( stateRepository ) ) {
             throw new ErrorCode( "1508231758" );
@@ -139,7 +171,70 @@ export class ContextStateFacade {
         this.dataSet( {
             repositories: {
                 ...state.repositories,
-                [ stateRepositoryName ]: stateRepository,
+                [ stateRepositoryKey ]: stateRepository,
+            },
+        } );
+
+        stateRepository.isFetching = false;
+
+        const item = await createAPI( data );
+
+        const timestamp = Date.now();
+
+        stateRepository.data.entities[ item[ idField ] as string ] = {
+            // @ts-expect-error TODO Predicate item assign to E
+            data      : item,
+            error     : undefined,
+            isError   : false,
+            isFetched : true,
+            isFetching: false,
+            isOutdated: false,
+            timestamp,
+        };
+
+        for ( const [ , list ] of Object.entries( stateRepository.data.lists ) ) {
+            list.timestamp = TIMESTAMP_CODE_NEED_UPDATE;
+            list.isOutdated = true;
+        }
+
+        for ( const [ , pages ] of Object.entries( stateRepository.data.pages ) ) {
+            pages.timestamp = TIMESTAMP_CODE_NEED_UPDATE;
+            pages.isOutdated = true;
+        }
+
+        this.dataSet( {
+            repositories: {
+                ...state.repositories,
+                [ stateRepositoryKey ]: stateRepository,
+            },
+        } );
+    }
+
+    public async repositoryDelete<E>( options: IRepositoryDeleteOptions ) {
+        if ( !this.dataGet || !this.dataSet ) {
+            throw new ErrorCode( "1508231755" );
+        }
+
+        const { deleteAPI, id, stateRepository: stateRepositoryKey } = options;
+
+        const state = this.dataGet();
+
+        const stateRepository = state.repositories[ stateRepositoryKey ];
+
+        if ( !isTDPStateRepository<E>( stateRepository ) ) {
+            throw new ErrorCode( "1508231758" );
+        }
+
+        if ( !stateRepository.data ) {
+            throw new ErrorCode( "1608231307" );
+        }
+
+        stateRepository.isFetching = true;
+
+        this.dataSet( {
+            repositories: {
+                ...state.repositories,
+                [ stateRepositoryKey ]: stateRepository,
             },
         } );
 
@@ -149,9 +244,7 @@ export class ContextStateFacade {
         delete stateRepository.data.entities[ id ];
 
         for ( const [ , list ] of Object.entries( stateRepository.data.lists ) ) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             if ( !!list.data && list.data.includes( id ) ) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 list.data = list.data.filter( v => v !== id );
             }
         }
@@ -170,30 +263,30 @@ export class ContextStateFacade {
             }
         }
 
-        await entityDeleteAPI( id );
+        await deleteAPI( id );
 
         this.dataSet( {
             repositories: {
                 ...state.repositories,
-                [ stateRepositoryName ]: stateRepository,
+                [ stateRepositoryKey ]: stateRepository,
             },
         } );
     }
 
-    public async stateRepositoryEntitiesListGet<E>( options: IStateRepositoryEntitiesGetOptions<E> ) {
+    public async repositoryListGet<E>( options: IRepositoryListGetOptions<E> ) {
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "2807231447" );
         }
 
-        const { entitiesListAPI, idField, stateRepositoryName } = options;
+        const { idField, listGetAPI, stateRepository: stateRepositoryKey } = options;
 
         const state = this.dataGet();
 
-        const stateRepositoryCurrent = state.repositories[ stateRepositoryName ];
+        const stateRepositoryCurrent = state.repositories[ stateRepositoryKey ];
 
         const stateRepository = isTDPStateRepository<E>( stateRepositoryCurrent )
             ? stateRepositoryCurrent
-            : ContextStateFacade.stateRepositoryGenerate<E>();
+            : ContextStateFacade.repositoryGenerate<E>();
 
         if ( !isTDPStateRepository( stateRepository ) ) {
             throw new ErrorCode( "2707231655" );
@@ -209,32 +302,47 @@ export class ContextStateFacade {
             repositories: {
                 ...state.repositories,
                 // @ts-expect-error TS does not recognize correspondence
-                [ stateRepositoryName ]: stateRepository,
+                [ stateRepositoryKey ]: stateRepository,
             },
         } );
 
         stateRepository.isFetching = false;
 
-        const data = await entitiesListAPI();
+        const data = await listGetAPI();
 
         const timestamp = Date.now();
 
         data.reduce( ( acc, item ) => {
-            acc[ item[ idField ] as string ] = {
+            const entityNew = {
                 data      : item,
                 error     : undefined,
                 isError   : false,
                 isFetched : true,
                 isFetching: false,
+                isOutdated: false,
                 timestamp,
             };
+            if (
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                !acc[ item[ idField ] as string ]
+                || !!ContextStateFacade.isReplaceDataInDPStructureNeeded<E>(
+                    acc[ item[ idField ] as string ],
+                    item,
+                )
+            ) {
+                acc[ item[ idField ] as string ] = entityNew;
+            }
             return acc;
         }, stateRepository.data.entities );
 
         stateRepository.data.lists[ DEFAULT_PARAMS_STRING ]
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             = stateRepository.data.lists[ DEFAULT_PARAMS_STRING ]
-            ?? ContextStateFacade.dataProcessingGenerate<TEntitiesList>( [] );
+            && !ContextStateFacade.isOutdated( stateRepository.data.lists[ DEFAULT_PARAMS_STRING ] )
+                ? stateRepository.data.lists[ DEFAULT_PARAMS_STRING ]
+                : ContextStateFacade.dataProcessingGenerate<TEntitiesList>( [] );
+
+        stateRepository.isOutdated = false;
 
         data.reduce( ( acc, item ) => {
             acc.data?.push( String( item[ idField ] ) );
@@ -245,19 +353,19 @@ export class ContextStateFacade {
             repositories: {
                 ...state.repositories,
                 // @ts-expect-error TS does not recognize correspondence
-                [ stateRepositoryName ]: stateRepository,
+                [ stateRepositoryKey ]: stateRepository,
             },
         } );
 
         return stateRepository.data.lists[ DEFAULT_PARAMS_STRING ].data;
     }
 
-    public formInitialValuesSet<F>( options: IFormInitialValuesSetOptions<F> ) {
+    public formValuesInitialSet<F>( options: IFormValuesInitialSetOptions<F> ) {
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "1908231722" );
         }
 
-        const { force, initialValuesGet, stateForm } = options;
+        const { force, stateForm, valuesInitialGet } = options;
 
         const state = this.dataGet();
 
@@ -269,21 +377,21 @@ export class ContextStateFacade {
             forms: {
                 ...state.forms,
                 // @ts-expect-error F does not extendable (?)
-                [ stateForm ]: ContextStateFacade.formGenerate( initialValuesGet() ),
+                [ stateForm ]: ContextStateFacade.formGenerate( valuesInitialGet() ),
             },
         } );
     }
 
-    public formValueSet<F>( options: IFormValueSetOptions<F> ) {
+    public formFieldValueSet<F>( options: IFormFieldValueSetOptions<F> ) {
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "1908231722" );
         }
 
-        const { formField, initialValuesGet, stateForm, value } = options;
+        const { formField, stateForm, value, valuesInitialGet } = options;
 
-        this.formInitialValuesSet<F>( {
-            initialValuesGet,
+        this.formValuesInitialSet<F>( {
             stateForm,
+            valuesInitialGet,
         } );
 
         const state = this.dataGet();
@@ -305,31 +413,14 @@ export class ContextStateFacade {
         this.dataSet( state );
     }
 
-    // public formDataGet <F>( stateForm: keyof IContextStateDataForms ) {
-
-    //     if ( !this.dataGet || !this.dataSet ) {
-    //         throw new ErrorCode( "2208231541" );
-    //     }
-
-    //     const state = this.dataGet();
-
-    //     if ( !state.forms[ stateForm ] ) {
-    //         throw new ErrorCode( "2008231547" );
-    //     }
-
-    //     const { data } = state.forms[ stateForm ] ?? {};
-
-    //     return data as F | undefined;
-    // }
-
-    public async formDataSubmit<F, E, ERT>(
-        options: IFormDataSubmitOptions<F, E, ERT>,
-    ): Promise<boolean | IStateForm<F, ERT>["errors"]> {
+    public async formSubmit<F, E>(
+        options: IFormDataSubmitOptions<F, E>,
+    ): Promise<boolean | IStateForm<F>["errors"]> {
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "2208231604" );
         }
 
-        const { formDataIsValid, formDataToEntityAdapter, initialValuesGet, stateForm, submit }
+        const { formDataIsValid, formDataToEntityAdapter, stateForm, submit, valuesInitialGet }
             = options;
 
         const state = this.dataGet();
@@ -363,7 +454,10 @@ export class ContextStateFacade {
             state.forms[ stateForm ].isSubmitting = false;
 
             // @ts-expect-error Not null
-            state.forms[ stateForm ].data = { ...initialValuesGet() };
+            state.forms[ stateForm ].data = { ...valuesInitialGet() };
+
+            // @ts-expect-error Not null
+            state.forms[ stateForm ].touched = {};
 
             this.dataSet( state );
 

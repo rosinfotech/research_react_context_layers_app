@@ -1,4 +1,4 @@
-import type { AxiosInstance } from "axios";
+import type { AxiosInstance, AxiosResponse } from "axios";
 
 export interface IContextAPIProviderState {
     baseUrl: string;
@@ -11,3 +11,5 @@ export interface IContextAPIValue extends IContextAPIProviderState {
 }
 
 export type TResponseArrayEntity<D> = Array<D>;
+
+export type TResponseEntity<D> = AxiosResponse<D>;

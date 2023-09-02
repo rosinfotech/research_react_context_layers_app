@@ -1,23 +1,41 @@
 import { validate } from "@utils/validate";
 import type { IUser, IUserFormCreate } from "@@types";
 import { FormAbstract } from "./FormAbstract";
+import type { IContextStateForms } from "@contexts/ContextState";
 
 export class FormUserCreate extends FormAbstract<IUserFormCreate, IUser> {
 
-    constructor () {
-        super( {
-            stateForm: "userCreate",
-        } );
-    }
+    protected _stateForm: keyof IContextStateForms = "formUserCreate";
 
-    public initialValuesGet = () => ( {
-        email          : "",
-        login          : "",
-        name           : "",
-        password       : "",
-        passwordConfirm: "",
-        surname        : "",
-    } ) as IUserFormCreate;
+    // public valuesInitialGet () {
+    //     return ( {
+    //         email          : "",
+    //         login          : "",
+    //         name           : "",
+    //         password       : "",
+    //         passwordConfirm: "",
+    //         surname        : "",
+    //     } ) as IUserFormCreate;
+    // }
+
+    public valuesInitialGet () {
+        const dateCurrent = new Date();
+        const prefix = [
+            dateCurrent.getDay(),
+            dateCurrent.getMonth(),
+            dateCurrent.getFullYear(),
+            dateCurrent.getHours(),
+            dateCurrent.getMinutes(),
+        ].join( "" );
+        return {
+            email          : `email${ prefix }@email${ prefix }.com`,
+            login          : `login${ prefix }`,
+            name           : `name${ prefix }`,
+            password       : prefix,
+            passwordConfirm: prefix,
+            surname        : `surname${ prefix }`,
+        } as IUserFormCreate;
+    }
 
     public formDataToEntityAdapter ( data: IUserFormCreate ) {
         const { email, login, surname } = data;
