@@ -1,5 +1,9 @@
 import { ErrorCode, memoize } from "@rosinfo.tech/utils";
-import type { ContextStateFacade, IContextStateForms, IStateForm } from "@contexts/ContextState";
+import type {
+    ContextStateFacade,
+    IContextStateDataForms,
+    IStateForm,
+} from "@contexts/ContextState";
 import type { ChangeEvent } from "react";
 
 export class FormAbstract<F, E> {
@@ -8,7 +12,7 @@ export class FormAbstract<F, E> {
         formField: keyof F
     ) => ( e: ChangeEvent<H> ) => void;
 
-    protected _stateForm: keyof IContextStateForms | null = null;
+    protected _stateForm: keyof IContextStateDataForms | null = null;
 
     private _stateFacade: ContextStateFacade | null = null;
 
@@ -16,7 +20,7 @@ export class FormAbstract<F, E> {
 
     constructor () {
         this.formDataToEntityAdapter = this.formDataToEntityAdapter.bind( this );
-        this.valuesInitial = this.valuesInitial.bind( this );
+        this.valuesInitialSet = this.valuesInitialSet.bind( this );
         this.valuesInitialGet = this.valuesInitialGet.bind( this );
         this.isInitialized = this.isInitialized.bind( this );
         this.isInitializedException = this.isInitializedException.bind( this );
@@ -39,7 +43,7 @@ export class FormAbstract<F, E> {
     public get stateForm () {
         this.isInitializedException();
 
-        return this._stateForm as keyof IContextStateForms;
+        return this._stateForm as keyof IContextStateDataForms;
     }
 
     // eslint-disable-next-line @typescript-eslint/member-ordering
@@ -53,7 +57,7 @@ export class FormAbstract<F, E> {
         this._submit = !!submit ? submit.bind( this ) : submit;
     }
 
-    public valuesInitial ( force?: boolean ) {
+    public valuesInitialSet ( force?: boolean ) {
         if ( !this._stateForm ) {
             return false;
         }
@@ -71,7 +75,7 @@ export class FormAbstract<F, E> {
         const isInitialized = !!this._stateFacade && !!this._stateForm && !!this.submit;
 
         if ( isInitialized ) {
-            this.valuesInitial();
+            this.valuesInitialSet();
         }
 
         return isInitialized;
@@ -121,7 +125,7 @@ export class FormAbstract<F, E> {
     }
 
     public onReset () {
-        this.valuesInitial( true );
+        this.valuesInitialSet( true );
     }
 
     private _formFieldOnChangeEventGet<H extends HTMLInputElement>(
@@ -132,7 +136,7 @@ export class FormAbstract<F, E> {
         return ( e ) => {
             this.stateFacade?.formFieldValueSet<F>( {
                 formField,
-                stateForm       : this._stateForm as keyof IContextStateForms,
+                stateForm       : this._stateForm as keyof IContextStateDataForms,
                 value           : e.target.value as F[keyof F],
                 valuesInitialGet: this.valuesInitialGet,
             } );

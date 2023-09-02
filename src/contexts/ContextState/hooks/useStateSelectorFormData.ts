@@ -1,7 +1,7 @@
-import { type IContextStateForms, useContextStateSelector } from "@contexts/ContextState";
+import { type IContextStateDataForms, useContextStateSelector } from "@contexts/ContextState";
 
 export interface IUseStateSelectorFormDataOptions {
-    stateForm: keyof IContextStateForms;
+    stateForm: keyof IContextStateDataForms;
 }
 
 export const useStateSelectorFormData = ( options: IUseStateSelectorFormDataOptions ) => {

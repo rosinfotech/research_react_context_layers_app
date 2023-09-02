@@ -14,6 +14,9 @@ const contextStateInitialState: IContextStateData = {
     repositories: {
         repositoryUsers: null,
     },
+    services: {
+        serviceUI: null,
+    },
 };
 
 const contextStateInitialValue: IContextStateValue = {

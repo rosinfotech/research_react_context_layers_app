@@ -1,11 +1,11 @@
 import { validate } from "@utils/validate";
 import type { IUser, IUserFormCreate } from "@@types";
 import { FormAbstract } from "./FormAbstract";
-import type { IContextStateForms } from "@contexts/ContextState";
+import type { IContextStateDataForms } from "@contexts/ContextState";
 
 export class FormUserCreate extends FormAbstract<IUserFormCreate, IUser> {
 
-    protected _stateForm: keyof IContextStateForms = "formUserCreate";
+    protected _stateForm: keyof IContextStateDataForms = "formUserCreate";
 
     // public valuesInitialGet () {
     //     return ( {

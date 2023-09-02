@@ -1,4 +1,5 @@
 import { ErrorCode, isBoolean, objectClone } from "@rosinfo.tech/utils";
+import { set } from "@utils/set";
 import {
     DEFAULT_PARAMS_STRING,
     TIMESTAMP_CODE_NEED_UPDATE,
@@ -6,8 +7,9 @@ import {
 } from "./constants";
 import { isTDPStateRepository } from "./types";
 import type {
-    IContextStateForms,
-    IContextStateRepositories,
+    IContextStateDataForms,
+    IContextStateDataRepositories,
+    IContextStateDataServices,
     IDataProcessing,
     IStateForm,
     TDPStateRepository,
@@ -20,31 +22,31 @@ import type {
 interface IRepositoryListGetOptions<E> {
     idField: keyof E;
     listGetAPI: () => Promise<Array<E>>;
-    stateRepository: keyof IContextStateRepositories;
+    stateRepository: keyof IContextStateDataRepositories;
 }
 
 interface IRepositoryDeleteOptions {
     deleteAPI: ( id: TId ) => Promise<void>;
     id: TId;
-    stateRepository: keyof IContextStateRepositories;
+    stateRepository: keyof IContextStateDataRepositories;
 }
 
 interface IRepositoryCreateOptions<E> {
     createAPI: ( data: E ) => Promise<E>;
     data: E;
     idField: keyof E;
-    stateRepository: keyof IContextStateRepositories;
+    stateRepository: keyof IContextStateDataRepositories;
 }
 
 interface IFormValuesInitialSetOptions<F> {
     force?: boolean;
-    stateForm: keyof IContextStateForms;
+    stateForm: keyof IContextStateDataForms;
     valuesInitialGet: () => F;
 }
 
 interface IFormFieldValueSetOptions<F, N extends keyof F = keyof F> {
     formField: N;
-    stateForm: keyof IContextStateForms;
+    stateForm: keyof IContextStateDataForms;
     value: F[N];
     valuesInitialGet: () => F;
 }
@@ -52,9 +54,21 @@ interface IFormFieldValueSetOptions<F, N extends keyof F = keyof F> {
 interface IFormDataSubmitOptions<F, E> {
     formDataIsValid: ( data: F ) => boolean | IStateForm<F>["errors"];
     formDataToEntityAdapter: ( entity: F ) => E;
-    stateForm: keyof IContextStateForms;
+    stateForm: keyof IContextStateDataForms;
     submit: ( entity: E ) => Promise<void>;
     valuesInitialGet: () => F;
+}
+
+interface IServiceValuesInitialSetOptions<S> {
+    force?: boolean;
+    stateService: keyof IContextStateDataServices;
+    valuesInitialGet: () => S;
+}
+
+interface IServicePropertyValueSetOptions {
+    path: string;
+    stateService: keyof IContextStateDataServices;
+    value: unknown;
 }
 
 export class ContextStateFacade {
@@ -470,6 +484,49 @@ export class ContextStateFacade {
         this.dataSet( state );
 
         return validationResult;
+    }
+
+    public serviceValuesInitialSet<S>( options: IServiceValuesInitialSetOptions<S> ) {
+        if ( !this.dataGet || !this.dataSet ) {
+            throw new ErrorCode( "0209231855" );
+        }
+
+        const { force, stateService, valuesInitialGet } = options;
+
+        const state = this.dataGet();
+
+        if ( !force && !!state.services[ stateService ] ) {
+            return;
+        }
+
+        this.dataSet( {
+            services: {
+                ...state.services,
+                // @ts-expect-error S does not extendable (?)
+                [ stateService ]: valuesInitialGet(),
+            },
+        } );
+    }
+
+    public servicePropertyValueSet ( options: IServicePropertyValueSetOptions ) {
+        if ( !this.dataGet || !this.dataSet ) {
+            throw new ErrorCode( "0209231911" );
+        }
+
+        const { path, stateService, value } = options;
+
+        const state = this.dataGet();
+
+        const service = state.services[ stateService ];
+
+        set( service, path, value );
+
+        this.dataSet( {
+            services: {
+                ...state.services,
+                [ stateService ]: service,
+            },
+        } );
     }
 
 }

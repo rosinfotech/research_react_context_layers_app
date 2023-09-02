@@ -3,7 +3,7 @@ import { ErrorCode } from "@rosinfo.tech/utils";
 import type { TAPI, TResponseArrayEntity } from "@contexts/ContextAPI";
 import type {
     ContextStateFacade,
-    IContextStateRepositories,
+    IContextStateDataRepositories,
     TEntitiesList,
     TId,
 } from "@contexts/ContextState";
@@ -25,7 +25,7 @@ export class RepositoryAbstract<E> {
 
     private _stateFacade: ContextStateFacade | null = null;
 
-    protected _stateRepository: keyof IContextStateRepositories | null = null;
+    protected _stateRepository: keyof IContextStateDataRepositories | null = null;
 
     protected _idField: keyof E | null = null;
 
@@ -55,6 +55,7 @@ export class RepositoryAbstract<E> {
         if ( !this.isInitialized() ) {
             throw new ErrorCode( "2607232214", `Repository is not initialized` );
         }
+
         return true;
     }
 
@@ -115,7 +116,7 @@ export class RepositoryAbstract<E> {
     public get stateRepository () {
         this.isInitializedException();
 
-        return this._stateRepository as keyof IContextStateRepositories;
+        return this._stateRepository as keyof IContextStateDataRepositories;
     }
 
 }

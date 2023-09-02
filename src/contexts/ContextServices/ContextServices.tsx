@@ -1,8 +1,13 @@
-import { createContext, useContext, useMemo } from "react";
+import { useContextAPI } from "@contexts/ContextAPI";
+import { stateFacade } from "@contexts/ContextState";
+import { createContext, useContext } from "react";
+import { ServiceUI } from "./services/ServiceUI";
 import type { IContextServicesProviderState, TContextServicesValue } from "./types";
 import type { FC, PropsWithChildren } from "react";
 
-const contextServicesInitialState: IContextServicesProviderState = {};
+const contextServicesInitialState: IContextServicesProviderState = {
+    serviceUI: new ServiceUI(),
+};
 
 const contextServicesInitialValue: IContextServicesProviderState = {
     ...contextServicesInitialState,
@@ -15,7 +20,20 @@ export function useContextServices (): TContextServicesValue {
 }
 
 export const ContextServicesProvider: FC<PropsWithChildren> = ( { children } ) => {
-    const value = useMemo<TContextServicesValue>( () => contextServicesInitialValue, [] );
+    const { api } = useContextAPI();
 
-    return <ContextServices.Provider value={ value }>{children}</ContextServices.Provider>;
+    if ( !api ) {
+        return null;
+    }
+
+    const { serviceUI } = contextServicesInitialValue;
+
+    serviceUI.api = api;
+    serviceUI.stateFacade = stateFacade;
+
+    return (
+        <ContextServices.Provider value={ contextServicesInitialValue }>
+            {children}
+        </ContextServices.Provider>
+    );
 };

@@ -1,5 +1,5 @@
 import { isObject } from "@rosinfo.tech/utils";
-import type { IUser, IUserFormCreate } from "@@types";
+import type { IUI, IUser, IUserFormCreate } from "@@types";
 import type { ContextStateFacade } from "./ContextStateFacade";
 
 export type TId = string;
@@ -55,17 +55,22 @@ export interface IStateForm<F> {
     };
 }
 
-export interface IContextStateForms {
+export interface IContextStateDataForms {
     formUserCreate: IStateForm<IUserFormCreate> | null;
 }
 
-export interface IContextStateRepositories {
+export interface IContextStateDataRepositories {
     repositoryUsers: TDPStateRepository<IUser> | null;
 }
 
+export interface IContextStateDataServices {
+    serviceUI: IUI | null;
+}
+
 export interface IContextStateData {
-    forms: IContextStateForms;
-    repositories: IContextStateRepositories;
+    forms: IContextStateDataForms;
+    repositories: IContextStateDataRepositories;
+    services: IContextStateDataServices;
 }
 
 export type TDataSet = ( stateNext: Partial<IContextStateData> ) => void;

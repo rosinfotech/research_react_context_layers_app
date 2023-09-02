@@ -1,6 +1,6 @@
 import { RepositoryViewList, useContextRepositories } from "@contexts/ContextRepositories";
+import { ServiceUIDialogButtonOpen } from "@contexts/ContextServices";
 import { DialogUserCreate } from "@dialogs/DialogUserCreate";
-import { useButtonOpen } from "@hooks";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Box, IconButton } from "@mui/material";
 import { BoxStyledRendererUser, UserRenderer } from "@renderers/RendererUser";
@@ -15,8 +15,6 @@ export const PageIndex: FC = () => {
         name           : `Add user`,
         withNodesNested: false,
     } );
-
-    const [ IconButtonOpen, open, onClose ] = useButtonOpen( IconButton );
 
     return (
         <>
@@ -35,12 +33,16 @@ export const PageIndex: FC = () => {
                     repository={ repositoryUsers }
                 />
                 <BoxStyledRendererUser ref={ colorizeRenderRef }>
-                    <IconButtonOpen size="large">
+                    <ServiceUIDialogButtonOpen<typeof IconButton>
+                        Component={ IconButton }
+                        dialog="userCreate"
+                        size="large"
+                    >
                         <AddCircleIcon />
-                    </IconButtonOpen>
+                    </ServiceUIDialogButtonOpen>
                 </BoxStyledRendererUser>
             </Box>
-            <DialogUserCreate open={ open } onClose={ onClose } />
+            <DialogUserCreate />
         </>
     );
 };

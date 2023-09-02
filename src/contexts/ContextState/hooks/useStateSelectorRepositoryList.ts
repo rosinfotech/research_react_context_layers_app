@@ -1,9 +1,9 @@
 import { DEFAULT_PARAMS_STRING, useContextStateSelector } from "@contexts/ContextState";
-import type { IContextStateRepositories, TParamsString } from "@contexts/ContextState";
+import type { IContextStateDataRepositories, TParamsString } from "@contexts/ContextState";
 
 export interface IUseStateSelectorRepositoryListOptions {
     paramsString?: TParamsString;
-    stateRepository: keyof IContextStateRepositories;
+    stateRepository: keyof IContextStateDataRepositories;
 }
 
 export const useStateSelectorRepositoryList = ( options: IUseStateSelectorRepositoryListOptions ) => {

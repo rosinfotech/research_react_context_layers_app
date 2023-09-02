@@ -1,4 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface IContextServicesProviderState {}
+import type { ServiceUI } from "./services/ServiceUI";
+
+export interface IContextServicesProviderState {
+    serviceUI: ServiceUI;
+}
 
 export type TContextServicesValue = IContextServicesProviderState;

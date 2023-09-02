@@ -3,3 +3,4 @@ export * from "./useStateSelectorFormData";
 export * from "./useStateSelectorFormErrorsField";
 export * from "./useStateSelectorRepositoryList";
 export * from "./useStateSelectorRepositoryListIsOutdated";
+export * from "./useStateSelectorServiceProperty";

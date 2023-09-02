@@ -2,11 +2,11 @@ import { ErrorCode } from "@rosinfo.tech/utils";
 import type { IUser } from "@@types";
 import { RepositoryAbstract } from "./RepositoryAbstract";
 import type { TResponseArrayEntity, TResponseEntity } from "@contexts/ContextAPI";
-import type { IContextStateRepositories, TId } from "@contexts/ContextState";
+import type { IContextStateDataRepositories, TId } from "@contexts/ContextState";
 
 export class RepositoryUsers extends RepositoryAbstract<IUser> {
 
-    protected _stateRepository: keyof IContextStateRepositories = "repositoryUsers";
+    protected _stateRepository: keyof IContextStateDataRepositories = "repositoryUsers";
 
     protected _idField: keyof IUser = "id";
 

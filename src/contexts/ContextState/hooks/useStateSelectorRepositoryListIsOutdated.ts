@@ -1,13 +1,13 @@
 import { DEFAULT_PARAMS_STRING, useContextStateSelector } from "@contexts/ContextState";
-import type { IContextStateRepositories, TParamsString } from "@contexts/ContextState";
+import type { IContextStateDataRepositories, TParamsString } from "@contexts/ContextState";
 
-export interface IUseStateSelectorRepositoryListOptions {
+export interface IUseStateSelectorRepositoryListIsOutdatedOptions {
     paramsString?: TParamsString;
-    stateRepository: keyof IContextStateRepositories;
+    stateRepository: keyof IContextStateDataRepositories;
 }
 
 export const useStateSelectorRepositoryListIsOutdated = (
-    options: IUseStateSelectorRepositoryListOptions,
+    options: IUseStateSelectorRepositoryListIsOutdatedOptions,
 ) => {
     const { paramsString = DEFAULT_PARAMS_STRING, stateRepository } = options;
 
