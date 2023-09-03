@@ -14,7 +14,11 @@ npx @rosinfo.tech/cli pack development
 
 ```
 
-# Repositories
+# WIP (!)
+
+# The 1st approximation
+
+## Repositories
 
 - Repository:
 
@@ -28,7 +32,7 @@ npx @rosinfo.tech/cli pack development
 
     - Pages mapped by encoded params string with arrays containing pages that contains arrays of PK;
 
-## Data processing interface
+### Data processing interface
 
 - All data in all repositories wrapped by structure with interface IDataProcessing&lt;D&gt;:
 
@@ -54,7 +58,7 @@ export interface IDataProcessing<D> {
 
 - Futhermore, every element of data wrapped by IDataProcessing&lt;D&gt;;
 
-### Repository interface
+#### Repository interface
 
 - Repository data save in @contexts/ContextState, so the interfaces described in [@contexts/ContextState.types](./src/contexts/ContextState/types.ts):
 
@@ -93,3 +97,7 @@ export interface IStateRepository<D> {
 
 export type TDPStateRepository<D> = IDataProcessing<IStateRepository<D>>;
 ```
+
+# How to add new form
+
+-

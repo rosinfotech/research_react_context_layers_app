@@ -16,14 +16,9 @@ export type TFormButtonSubmitProps<F, C extends ElementType> = {
 } & IFormButtonSubmitBaseProps &
 ComponentProps<C>;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type TFormButtonSubmit = <F, E, C extends ElementType = ElementType>(
-    props: TFormButtonSubmitProps<F, C>
-) => JSX.Element | null;
-
-export const FormButtonSubmit: TFormButtonSubmit = <F, E, C extends ElementType = ElementType>(
+export const FormButtonSubmit = <F, E, C extends ElementType = ElementType>(
     props: TFormButtonSubmitProps<F, C>,
-) => {
+): JSX.Element | null => {
     const { Component, form: formName, onSubmitted, ...rest } = props;
 
     const form = useForm<F, E>( formName );

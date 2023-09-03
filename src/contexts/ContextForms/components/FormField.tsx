@@ -19,24 +19,14 @@ type TFormFieldProps<F, C extends ElementType, H extends HTMLInputElement> = {
 } & IFormFieldBaseProps<H> &
 ComponentProps<C>;
 
-type TFormField = <
-    F,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    E,
-    C extends ElementType = ElementType,
-    H extends HTMLInputElement = HTMLInputElement,
->(
-    props: TFormFieldProps<F, C, H>
-) => JSX.Element | null;
-
-export const FormField: TFormField = <
+export const FormField = <
     F,
     E,
     C extends ElementType = ElementType,
     H extends HTMLInputElement = HTMLInputElement,
 >(
     props: TFormFieldProps<F, C, H>,
-) => {
+): JSX.Element | null => {
     const { Component, form: formName, formField, ...rest } = props;
 
     const form = useForm<F, E>( formName );

@@ -7,15 +7,9 @@ export type TServiceUIDialogButtonOpenProps<C extends ElementType> = {
     dialog: keyof IUIDialogs;
 } & ComponentProps<C>;
 
-export type TServiceUIDialogButtonOpen = <C extends ElementType = ElementType>(
-    props: TServiceUIDialogButtonOpenProps<C>
-) => JSX.Element | null;
-
-export const ServiceUIDialogButtonOpen: TServiceUIDialogButtonOpen = <
-    C extends ElementType = ElementType,
->(
+export const ServiceUIDialogButtonOpen = <C extends ElementType>(
     props: TServiceUIDialogButtonOpenProps<C>,
-) => {
+): JSX.Element | null => {
     const { Component, dialog, ...rest } = props;
 
     const { serviceUI } = useContextServices();

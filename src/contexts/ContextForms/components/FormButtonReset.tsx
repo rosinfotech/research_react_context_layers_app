@@ -12,14 +12,9 @@ export type TFormButtonResetProps<C extends ElementType> = {
 } & IFormButtonResetBaseProps &
 ComponentProps<C>;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type TFormButtonReset = <F, E, C extends ElementType = ElementType>(
-    props: TFormButtonResetProps<C>
-) => JSX.Element | null;
-
-export const FormButtonReset: TFormButtonReset = <F, E, C extends ElementType = ElementType>(
+export const FormButtonReset = <F, E, C extends ElementType = ElementType>(
     props: TFormButtonResetProps<C>,
-) => {
+): JSX.Element | null => {
     const { Component, form: formName, ...rest } = props;
 
     const form = useForm<F, E>( formName );

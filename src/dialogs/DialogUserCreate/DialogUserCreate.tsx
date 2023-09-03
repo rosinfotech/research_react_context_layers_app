@@ -1,20 +1,19 @@
 import { ServiceUIDialog, useContextServices } from "@contexts/ContextServices";
 import { FormUserCreate } from "@forms/FormUserCreate";
 import CloseIcon from "@mui/icons-material/Close";
-import { Box, Divider, IconButton, Typography } from "@mui/material";
-import type { IServiceUIDialogProps } from "@contexts/ContextServices";
+import { Box, Dialog, Divider, IconButton, Typography } from "@mui/material";
 import type { FC } from "react";
 
 const DIALOG = "userCreate";
 
-export const DialogUserCreate: FC<Omit<IServiceUIDialogProps, "dialog">> = ( props ) => {
+export const DialogUserCreate: FC = () => {
     const { serviceUI } = useContextServices();
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const onClose = serviceUI.closeDialog.bind( null, DIALOG );
 
     return (
-        <ServiceUIDialog { ...props } dialog={ DIALOG }>
+        <ServiceUIDialog Component={ Dialog } dialog={ DIALOG }>
             <Box
                 alignItems="center"
                 display="flex"
