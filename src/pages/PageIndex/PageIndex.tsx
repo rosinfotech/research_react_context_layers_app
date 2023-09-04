@@ -1,6 +1,7 @@
 import { RepositoryViewList, useContextRepositories } from "@contexts/ContextRepositories";
 import { ServiceUIDialogButtonOpen } from "@contexts/ContextServices";
 import { DialogUserCreate } from "@dialogs/DialogUserCreate";
+import { DialogUserUpdate } from "@dialogs/DialogUserUpdate";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Box, IconButton } from "@mui/material";
 import { BoxStyledRendererUser, UserRenderer } from "@renderers/RendererUser";
@@ -43,6 +44,7 @@ export const PageIndex: FC = () => {
                 </BoxStyledRendererUser>
             </Box>
             <DialogUserCreate />
+            <DialogUserUpdate />
         </>
     );
 };

@@ -17,43 +17,29 @@ export class RepositoryAbstract<E> {
         this.deleteAPI = this.deleteAPI.bind( this );
         this.isInitialized = this.isInitialized.bind( this );
         this.isInitializedException = this.isInitializedException.bind( this );
+        this.update = this.update.bind( this );
+        this.updateAPI = this.updateAPI.bind( this );
         this.listGet = this.listGet.bind( this );
         this.listGetAPI = this.listGetAPI.bind( this );
     }
 
-    private _api: TAPI | null = null;
+    public api: TAPI | null = null;
 
-    private _stateFacade: ContextStateFacade | null = null;
+    public stateFacade: ContextStateFacade | null = null;
 
-    protected _stateRepository: keyof IContextStateDataRepositories | null = null;
+    protected stateRepository: keyof IContextStateDataRepositories | null = null;
 
-    protected _idField: keyof E | null = null;
-
-    public get api () {
-        return this._api;
-    }
-
-    public set api ( api: TAPI | null ) {
-        this._api = api;
-    }
-
-    public get stateFacade () {
-        return this._stateFacade;
-    }
-
-    public set stateFacade ( stateFacade: ContextStateFacade | null ) {
-        this._stateFacade = stateFacade;
-    }
+    protected idField: keyof E | null = null;
 
     public isInitialized () {
-        return !!this._api && !!this._stateFacade && !!this._stateRepository && !!this._idField;
+        return !!this.api && !!this.stateFacade && !!this.stateRepository && !!this.idField;
     }
 
     public isInitializedException () {
         this.stateFacade?.isInitializedException();
 
         if ( !this.isInitialized() ) {
-            throw new ErrorCode( "2607232214", `Repository is not initialized` );
+            throw new ErrorCode( "2607232214" );
         }
 
         return true;
@@ -62,61 +48,98 @@ export class RepositoryAbstract<E> {
     public async create ( entity: E ) {
         this.isInitializedException();
 
-        await this.stateFacade?.repositoryCreate<E>( {
+        if ( !this.stateFacade ) {
+            throw new ErrorCode( "0309231821" );
+        }
+
+        if ( !this.idField ) {
+            throw new ErrorCode( "0309231822" );
+        }
+
+        if ( !this.stateRepository ) {
+            throw new ErrorCode( "0309231823" );
+        }
+
+        return this.stateFacade.repositoryCreate<E>( {
             createAPI      : this.createAPI,
             data           : entity,
-            // @ts-expect-error Excluded _stateRepository === null by isInitializedException
-            idField        : this._idField,
-            // @ts-expect-error Excluded _stateRepository === null by isInitializedException
-            stateRepository: this._stateRepository,
+            idField        : this.idField,
+            stateRepository: this.stateRepository,
         } );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public async createAPI ( entity: E ): Promise<E> {
-        throw new ErrorCode(
-            "2208231254",
-            `Method "createAPI" must be implemented. Called with <${ JSON.stringify( entity ) }>`,
-        );
+        throw new ErrorCode( "2208231254" );
     }
 
     public async delete ( id: TId ) {
         this.isInitializedException();
 
+        if ( !this.stateRepository ) {
+            throw new ErrorCode( "0309231829" );
+        }
+
         await this.stateFacade?.repositoryDelete<E>( {
             deleteAPI      : this.deleteAPI,
             id,
-            // @ts-expect-error Excluded _stateRepository === null by isInitializedException
-            stateRepository: this._stateRepository,
+            stateRepository: this.stateRepository,
         } );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public async deleteAPI ( id: TId ): Promise<void> {
-        throw new ErrorCode(
-            "1608231347",
-            `Method "deleteAPI" must be implemented. Called with <${ id }>`,
-        );
+        throw new ErrorCode( "1608231347" );
+    }
+
+    public async update ( entity: E ) {
+        this.isInitializedException();
+
+        if ( !this.stateFacade ) {
+            throw new ErrorCode( "0309232340" );
+        }
+
+        if ( !this.idField ) {
+            throw new ErrorCode( "0309232341" );
+        }
+
+        if ( !this.stateRepository ) {
+            throw new ErrorCode( "0309232342" );
+        }
+
+        return this.stateFacade.repositoryUpdate<E>( {
+            data           : entity,
+            idField        : this.idField,
+            stateRepository: this.stateRepository,
+            updateAPI      : this.updateAPI,
+        } );
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    public async updateAPI ( entity: E ): Promise<E> {
+        throw new ErrorCode( "0309232343" );
     }
 
     public async listGet (): Promise<TEntitiesList | null | undefined> {
         this.isInitializedException();
 
+        if ( !this.idField ) {
+            throw new ErrorCode( "0309231827" );
+        }
+
+        if ( !this.stateRepository ) {
+            throw new ErrorCode( "0309231828" );
+        }
+
         return this.stateFacade?.repositoryListGet<E>( {
-            // @ts-expect-error Excluded _stateRepository === null by isInitializedException
-            idField        : this._idField,
+            idField        : this.idField,
             listGetAPI     : this.listGetAPI,
-            // @ts-expect-error Excluded _stateRepository === null by isInitializedException
-            stateRepository: this._stateRepository,
+            stateRepository: this.stateRepository,
         } );
     }
 
     public async listGetAPI (): Promise<TResponseArrayEntity<E>> {
-        throw new ErrorCode( "2907232217", `Method "listGetAPI" must be implemented` );
-    }
-
-    public get stateRepository () {
-        this.isInitializedException();
-
-        return this._stateRepository as keyof IContextStateDataRepositories;
+        throw new ErrorCode( "2907232217" );
     }
 
 }

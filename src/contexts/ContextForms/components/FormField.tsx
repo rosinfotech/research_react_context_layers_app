@@ -2,7 +2,7 @@ import {
     useStateSelectorFormDataField,
     useStateSelectorFormErrorsField,
 } from "@contexts/ContextState";
-import { useForm } from "../hooks";
+import { useContextForms } from "../ContextForms";
 import type { IContextFormsProviderState } from "../types";
 import type { ChangeEvent, ComponentProps, ElementType } from "react";
 
@@ -21,7 +21,6 @@ ComponentProps<C>;
 
 export const FormField = <
     F,
-    E,
     C extends ElementType = ElementType,
     H extends HTMLInputElement = HTMLInputElement,
 >(
@@ -29,7 +28,7 @@ export const FormField = <
 ): JSX.Element | null => {
     const { Component, form: formName, formField, ...rest } = props;
 
-    const form = useForm<F, E>( formName );
+    const forms = useContextForms();
 
     const formDataField = useStateSelectorFormDataField<F>( {
         formField,
@@ -45,7 +44,8 @@ export const FormField = <
         return null;
     }
 
-    const onChange = form.formFieldOnChangeEventGet( formField );
+    const onChange
+        = forms[ formName as keyof IContextFormsProviderState ].formFieldOnChangeEventGet( formField );
 
     return <Component { ...rest } error={ formErrorField } value={ formDataField } onChange={ onChange } />;
 };

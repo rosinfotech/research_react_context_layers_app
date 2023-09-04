@@ -1,5 +1,5 @@
 import { type ComponentProps, type ElementType, useCallback } from "react";
-import { useForm } from "../hooks/useForm";
+import { useContextForms } from "../ContextForms";
 import type { IContextFormsProviderState } from "../types";
 
 interface IFormButtonResetBaseProps {
@@ -12,16 +12,16 @@ export type TFormButtonResetProps<C extends ElementType> = {
 } & IFormButtonResetBaseProps &
 ComponentProps<C>;
 
-export const FormButtonReset = <F, E, C extends ElementType = ElementType>(
+export const FormButtonReset = <C extends ElementType = ElementType>(
     props: TFormButtonResetProps<C>,
 ): JSX.Element | null => {
     const { Component, form: formName, ...rest } = props;
 
-    const form = useForm<F, E>( formName );
+    const forms = useContextForms();
 
     const onClick = useCallback( () => {
-        form.onReset();
-    }, [ form ] );
+        forms[ formName as keyof IContextFormsProviderState ].onReset();
+    }, [ forms, formName ] );
 
     return <Component { ...rest } onClick={ onClick } />;
 };

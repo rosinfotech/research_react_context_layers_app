@@ -28,7 +28,7 @@ export const ServiceUIDialog = <C extends ElementType>(
     } );
 
     return (
-        <Component { ...rest } open={ !!open } onClose={ serviceUI.closeDialog.bind( null, "userCreate" ) }>
+        <Component { ...rest } open={ !!open } onClose={ serviceUI.closeDialog.bind( null, dialog ) }>
             {children}
         </Component>
     );

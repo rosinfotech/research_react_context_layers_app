@@ -1,11 +1,12 @@
+import { useContextForms } from "@contexts/ContextForms";
 import { useContextRepositories } from "@contexts/ContextRepositories";
-import { type TId, useContextStateSelector } from "@contexts/ContextState";
+import { ServiceUIDialogButtonOpen } from "@contexts/ContextServices";
+import { type TId, useStateSelectorRepositoryEntity } from "@contexts/ContextState";
 import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
 import { Avatar, Box, IconButton, Stack, Typography, styled } from "@mui/material";
 import { useColorizeRender } from "@rosinfo.tech/react";
-import { ErrorCode } from "@rosinfo.tech/utils";
-import { type FC, memo } from "react";
+import { type FC, memo, useCallback } from "react";
 import type { SxProps } from "@mui/material";
 
 interface IUserRendererProps {
@@ -39,11 +40,25 @@ export const UserRenderer: FC<IUserRendererProps> = memo( ( props ) => {
         withNodesNested: false,
     } );
 
-    const user = useContextStateSelector(
-        state => state.data.repositories.repositoryUsers?.data?.entities[ id ]?.data,
-    );
+    const user = useStateSelectorRepositoryEntity( {
+        id,
+        stateRepository: "repositoryUsers",
+    } );
+
+    const { formUserUpdate } = useContextForms();
 
     const { repositoryUsers } = useContextRepositories();
+
+    const onClickDelete = useCallback( () => {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        repositoryUsers.delete( id );
+    }, [ id, repositoryUsers ] );
+
+    const onClickEdit = useCallback( () => {
+        formUserUpdate.entityId = id;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        formUserUpdate.valuesInitialSet( true );
+    }, [ id, formUserUpdate ] );
 
     if ( !user ) {
         return null;
@@ -59,26 +74,19 @@ export const UserRenderer: FC<IUserRendererProps> = memo( ( props ) => {
                 {user.login}
             </Typography>
             <Stack direction="row" spacing={ 1 }>
-                <IconButton
-                    component={ Box }
-                    sx={ sxMarginPaddingNo }
-                    onClick={ () => {
-                        repositoryUsers.delete( id ).catch( ( e ) => {
-                            throw new ErrorCode( "1608231319", e );
-                        } );
-                    } }
-                >
+                <IconButton component={ Box } sx={ sxMarginPaddingNo } onClick={ onClickDelete }>
                     <CancelIcon />
                 </IconButton>
-                <IconButton
+                <ServiceUIDialogButtonOpen<typeof IconButton<typeof Box>>
+                    Component={ IconButton }
                     component={ Box }
+                    dialog="userUpdate"
+                    size="large"
                     sx={ sxMarginPaddingNo }
-                    onClick={ () => {
-                        console.log();
-                    } }
+                    onClick={ onClickEdit }
                 >
                     <EditIcon />
-                </IconButton>
+                </ServiceUIDialogButtonOpen>
             </Stack>
         </BoxStyledRendererUser>
     );

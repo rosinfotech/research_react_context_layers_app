@@ -10,6 +10,13 @@ export class ServiceAbstract<S> {
 
     protected stateService: keyof IContextStateDataServices | null = null;
 
+    constructor () {
+        this.valuesInitialSet = this.valuesInitialSet.bind( this );
+        this.valuesInitialGet = this.valuesInitialGet.bind( this );
+        this.isInitialized = this.isInitialized.bind( this );
+        this.isInitializedException = this.isInitializedException.bind( this );
+    }
+
     public valuesInitialSet ( force?: boolean ) {
         if ( !this.stateService ) {
             return false;

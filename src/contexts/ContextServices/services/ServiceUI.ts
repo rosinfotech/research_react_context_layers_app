@@ -16,6 +16,7 @@ export class ServiceUI extends ServiceAbstract<IUI> {
         return {
             dialogs: {
                 userCreate: false,
+                userUpdate: false,
             },
         };
     }

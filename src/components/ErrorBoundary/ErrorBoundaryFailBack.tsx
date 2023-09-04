@@ -22,6 +22,9 @@ export const ErrorBoundaryFailBack: FC<IErrorBoundaryFailBackProps> = ( props ) 
 
     const errorPDO = errorPDOExtract( error );
 
+    console.log( "info" );
+    console.log( info );
+
     return (
         <div
             style={ {
@@ -45,7 +48,7 @@ export const ErrorBoundaryFailBack: FC<IErrorBoundaryFailBackProps> = ( props ) 
             )}
             {isObject( info )
                 && <pre style={ stylePreDefault }>{JSON.stringify( info ).replace( /\\n/g, "\n" )}</pre>}
-            {!!info && <h2 style={ styleDefault }>{String( info )}</h2>}
+            {!isObject( info ) && !!info && <h2 style={ styleDefault }>{String( info )}</h2>}
         </div>
     );
 };

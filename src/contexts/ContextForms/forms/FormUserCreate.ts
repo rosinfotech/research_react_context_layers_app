@@ -5,18 +5,18 @@ import type { IContextStateDataForms } from "@contexts/ContextState";
 
 export class FormUserCreate extends FormAbstract<IUserFormCreate, IUser> {
 
-    protected _stateForm: keyof IContextStateDataForms = "formUserCreate";
+    protected stateForm: keyof IContextStateDataForms = "formUserCreate";
 
-    // public valuesInitialGet () {
-    //     return ( {
-    //         email          : "",
-    //         login          : "",
-    //         name           : "",
-    //         password       : "",
-    //         passwordConfirm: "",
-    //         surname        : "",
-    //     } ) as IUserFormCreate;
-    // }
+    public valuesInitialEmptyGet () {
+        return ( {
+            email          : "",
+            login          : "",
+            name           : "",
+            password       : "",
+            passwordConfirm: "",
+            surname        : "",
+        } ) as IUserFormCreate;
+    }
 
     public valuesInitialGet () {
         const dateCurrent = new Date();

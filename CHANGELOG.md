@@ -2,6 +2,90 @@
 
 # Changelog
 
+## [ 0.0.7 - 0.0.10 ] - 2023-08-30
+
+- @contexts/ContextForms:
+
+  - components:
+
+    - FormButtonReset;
+    - FormButtonSubmit;
+    - FormField;
+
+  - forms:
+
+    - FormAbstract;
+    - FormUserCreate;
+    - FormUserUpdate;
+
+  - ContextForms;
+  - ContextFormsInit;
+  - ContextFormsProvider;
+
+- @contexts/ContextRepositories:
+
+  - repositories:
+
+    - RepositoryAbstract;
+    - RepositoryUsers;
+
+  - ContextRepositories;
+  - ContextRepositoriesInit;
+  - ContextRepositoriesProvider;
+
+- @contexts/ContextServices:
+
+  - components:
+
+    - ServiceUIDialog;
+    - ServiceUIDialogButtonOpen;
+
+  - services:
+
+    - ServiceAbstract;
+    - ServiceUI;
+
+  - ContextServices;
+  - ContextServicesInit;
+  - ContextServicesProvider;
+
+- @contexts/ContextState:
+
+  - hooks:
+
+    - useStateSelectorFormData;
+    - useStateSelectorFormDataField;
+    - useStateSelectorFormErrorsField;
+    - useStateSelectorRepositoryEntity;
+    - useStateSelectorRepositoryList;
+    - useStateSelectorRepositoryListIsOutdated;
+    - useStateSelectorServiceProperty;
+
+  - ContextState;
+  - ContextStateFacade;
+
+- @dialogs:
+
+  - DialogUserCreate;
+  - DialogUserUpdate;
+
+- @forms:
+
+  - FormUserCreate;
+  - FormUserUpdate;
+
+- @hooks:
+
+  - useButtonOpen;
+
+- @utils:
+
+  - validate;
+  - errorPDOExtract;
+  - get;
+  - isObjectPlain;
+  - set;
+
 ## [ 0.0.4 - 0.0.7 ] - 2023-08-30
 
 - @contexts/ContextForms:

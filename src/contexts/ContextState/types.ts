@@ -57,6 +57,7 @@ export interface IStateForm<F> {
 
 export interface IContextStateDataForms {
     formUserCreate: IStateForm<IUserFormCreate> | null;
+    formUserUpdate: IStateForm<IUserFormCreate> | null;
 }
 
 export interface IContextStateDataRepositories {

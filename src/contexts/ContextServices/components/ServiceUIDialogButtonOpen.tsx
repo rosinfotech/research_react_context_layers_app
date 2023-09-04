@@ -1,4 +1,4 @@
-import { type ComponentProps, type ElementType } from "react";
+import { type ComponentProps, type ElementType, useCallback } from "react";
 import { useContextServices } from "../ContextServices";
 import type { IUIDialogs } from "@src/types";
 
@@ -10,15 +10,15 @@ export type TServiceUIDialogButtonOpenProps<C extends ElementType> = {
 export const ServiceUIDialogButtonOpen = <C extends ElementType>(
     props: TServiceUIDialogButtonOpenProps<C>,
 ): JSX.Element | null => {
-    const { Component, dialog, ...rest } = props;
+    const { Component, dialog, onClick: onClickProp, ...rest } = props;
 
     const { serviceUI } = useContextServices();
 
-    return (
-        <Component
-            { ...rest }
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            onClick={ serviceUI.openDialog.bind( null, dialog ) }
-        />
-    );
+    const onClick = useCallback( () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        onClickProp?.();
+        serviceUI.openDialog( dialog );
+    }, [ dialog, onClickProp, serviceUI ] );
+
+    return <Component { ...rest } onClick={ onClick } />;
 };

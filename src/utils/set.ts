@@ -13,11 +13,11 @@ export const set = <R extends { [k: string]: any }>(
         const pathElement = pathArray[ i ];
 
         if ( !isObject( ref ) ) {
-            throw new ErrorCode( "0209231939" );
+            throw new ErrorCode( "0209231938" );
         }
 
         if ( !( pathElement in ref ) ) {
-            throw new ErrorCode( "0209231930" );
+            throw new ErrorCode( "0209231929" );
         }
 
         ref = ref[ pathElement ];

@@ -1,5 +1,19 @@
 [![rosinfo.tech](https://cdn.rosinfo.tech/id/logo/id_logo_width_160.svg "rosinfo.tech")](https://rosinfo.tech)
 
+# WIP (!)
+
+# Research React Context Layer App
+
+## Main principles
+
+- High performance;
+- Declarative;
+- Reactive;
+
+### Others
+
+- Pass Roskoshinsky's React Architecture Test;
+
 # Run
 
 ```shell
@@ -13,8 +27,6 @@ rosinfo.tech pack development
 npx @rosinfo.tech/cli pack development
 
 ```
-
-# WIP (!)
 
 # The 1st approximation
 
@@ -100,4 +112,42 @@ export type TDPStateRepository<D> = IDataProcessing<IStateRepository<D>>;
 
 # How to add new form
 
--
+- Define type of form (for example [TFormUpdate](./src/types/users.ts));
+
+- Define global key of form and add field in interface [IContextStateDataForms](./src/contexts/ContextState/types.ts);
+
+- Add an according field in [contextStateInitialState](./src/contexts/ContextState/ContextState.tsx) with "null" value;
+
+- Create class in ./src/contexts/ContextForms/forms extends from FormAbstract;
+
+  - Creating entity form:
+
+    - Should implemented:
+
+      - FormAbstract.formDataToEntityAdapter;
+      - FormAbstract.isValid;
+      - FormAbstract.valuesInitialGet;
+
+  - Updating entity form:
+
+    - Should implemented:
+
+      - FormAbstract.valuesInitialEmptyGet;
+
+      - FormAbstract.valuesInitialGet:
+
+        ```typescript
+        public valuesInitialGet () {
+            return this.valuesInitialFromEntityGet();
+        }
+        ```
+
+      - FormAbstract.isValid;
+
+- Layout form in component @forms using generic components:
+
+  ```typescript
+  import { FormButtonReset, FormButtonSubmit, FormField } from "@contexts/ContextForms";
+  ```
+
+- ... in [IContextFormsProviderState](./src/contexts/ContextForms/types.ts);

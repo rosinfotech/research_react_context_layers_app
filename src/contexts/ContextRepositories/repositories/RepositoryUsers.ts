@@ -6,9 +6,9 @@ import type { IContextStateDataRepositories, TId } from "@contexts/ContextState"
 
 export class RepositoryUsers extends RepositoryAbstract<IUser> {
 
-    protected _stateRepository: keyof IContextStateDataRepositories = "repositoryUsers";
+    protected stateRepository: keyof IContextStateDataRepositories = "repositoryUsers";
 
-    protected _idField: keyof IUser = "id";
+    protected idField: keyof IUser = "id";
 
     public async createAPI ( user: IUser ) {
         if ( !this.api ) {
@@ -26,6 +26,23 @@ export class RepositoryUsers extends RepositoryAbstract<IUser> {
         }
 
         await this.api.delete( `users/${ id }` );
+    }
+
+    public async updateAPI ( user: IUser ) {
+        if ( !this.api ) {
+            throw new ErrorCode( "0509230102" );
+        }
+
+        if ( !user[ this.idField ] ) {
+            throw new ErrorCode( "0509230109" );
+        }
+
+        const { data } = await this.api.put<IUser, TResponseEntity<IUser>>(
+            `users/${ user[ this.idField ] }`,
+            user,
+        );
+
+        return data;
     }
 
     public async listGetAPI () {

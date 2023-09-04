@@ -2,7 +2,9 @@ import { ErrorCode, memoize } from "@rosinfo.tech/utils";
 import type {
     ContextStateFacade,
     IContextStateDataForms,
+    IContextStateDataRepositories,
     IStateForm,
+    TId,
 } from "@contexts/ContextState";
 import type { ChangeEvent } from "react";
 
@@ -12,13 +14,20 @@ export class FormAbstract<F, E> {
         formField: keyof F
     ) => ( e: ChangeEvent<H> ) => void;
 
-    protected _stateForm: keyof IContextStateDataForms | null = null;
+    public entityId: TId | null = null;
 
-    private _stateFacade: ContextStateFacade | null = null;
+    public stateFacade: ContextStateFacade | null = null;
+
+    protected stateForm: keyof IContextStateDataForms | null = null;
+
+    protected stateRepository: keyof IContextStateDataRepositories | null = null;
 
     private _submit: ( ( entity: E ) => Promise<E> ) | null = null;
 
     constructor () {
+        this.entityToFormDataAdapter = this.entityToFormDataAdapter.bind( this );
+        this.valuesInitialFromEntityGet = this.valuesInitialFromEntityGet.bind( this );
+        this.valuesInitialEmptyGet = this.valuesInitialEmptyGet.bind( this );
         this.formDataToEntityAdapter = this.formDataToEntityAdapter.bind( this );
         this.valuesInitialSet = this.valuesInitialSet.bind( this );
         this.valuesInitialGet = this.valuesInitialGet.bind( this );
@@ -28,22 +37,6 @@ export class FormAbstract<F, E> {
         this.formFieldOnChangeEventGet = memoize( this._formFieldOnChangeEventGet.bind( this ) );
         this.onSubmit = this.onSubmit.bind( this );
         this.onReset = this.onReset.bind( this );
-    }
-
-    // eslint-disable-next-line @typescript-eslint/member-ordering
-    public get stateFacade () {
-        return this._stateFacade;
-    }
-
-    public set stateFacade ( stateFacade: ContextStateFacade | null ) {
-        this._stateFacade = stateFacade;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/member-ordering
-    public get stateForm () {
-        this.isInitializedException();
-
-        return this._stateForm as keyof IContextStateDataForms;
     }
 
     // eslint-disable-next-line @typescript-eslint/member-ordering
@@ -58,13 +51,13 @@ export class FormAbstract<F, E> {
     }
 
     public valuesInitialSet ( force?: boolean ) {
-        if ( !this._stateForm ) {
+        if ( !this.stateForm ) {
             return false;
         }
 
         this.stateFacade?.formValuesInitialSet<F>( {
             force,
-            stateForm       : this._stateForm,
+            stateForm       : this.stateForm,
             valuesInitialGet: this.valuesInitialGet,
         } );
 
@@ -72,7 +65,7 @@ export class FormAbstract<F, E> {
     }
 
     public isInitialized () {
-        const isInitialized = !!this._stateFacade && !!this._stateForm && !!this.submit;
+        const isInitialized = !!this.stateFacade && !!this.stateForm && !!this.submit;
 
         if ( isInitialized ) {
             this.valuesInitialSet();
@@ -85,14 +78,43 @@ export class FormAbstract<F, E> {
         this.stateFacade?.isInitializedException();
 
         if ( !this.isInitialized() ) {
-            throw new ErrorCode( "1708231724", `Form is not initialized` );
+            throw new ErrorCode( "1708231724" );
         }
 
         return true;
     }
 
     public valuesInitialGet (): F {
-        throw new ErrorCode( "1908231651", `Method "valuesInitialGet" must be implemented` );
+        throw new ErrorCode( "1908231651" );
+    }
+
+    public valuesInitialEmptyGet (): F {
+        throw new ErrorCode( "0409232325" );
+    }
+
+    public valuesInitialFromEntityGet (): F {
+        if ( !this.stateFacade ) {
+            throw new Error( "0309232252" );
+        }
+
+        if ( !this.stateRepository ) {
+            throw new Error( "0309232232" );
+        }
+
+        if ( !this.entityId ) {
+            return this.valuesInitialEmptyGet();
+        }
+
+        const entity = this.stateFacade.repositoryEntityGet<E>( {
+            id             : this.entityId,
+            stateRepository: this.stateRepository,
+        } );
+
+        return this.entityToFormDataAdapter( entity );
+    }
+
+    public entityToFormDataAdapter ( data: E ) {
+        return data as unknown as F;
     }
 
     public isValid ( data: F ): boolean | IStateForm<F>["errors"] {
@@ -112,12 +134,23 @@ export class FormAbstract<F, E> {
     ) {
         this.isInitializedException();
 
+        if ( !this.stateFacade ) {
+            throw new ErrorCode( "0309232253" );
+        }
+
+        if ( !this.stateForm ) {
+            throw new ErrorCode( "0309232212" );
+        }
+
+        if ( !this.submit ) {
+            throw new ErrorCode( "0309232213" );
+        }
+
         return this.stateFacade
-            ?.formSubmit<F, E>( {
+            .formSubmit<F, E>( {
             formDataIsValid        : this.isValid,
             formDataToEntityAdapter: this.formDataToEntityAdapter,
             stateForm              : this.stateForm,
-            // @ts-expect-error Not null
             submit                 : this.submit,
             valuesInitialGet       : this.valuesInitialGet,
         } )
@@ -134,9 +167,13 @@ export class FormAbstract<F, E> {
         this.isInitializedException();
 
         return ( e ) => {
-            this.stateFacade?.formFieldValueSet<F>( {
+            if ( !this.stateFacade ) {
+                throw new ErrorCode( "0309232254" );
+            }
+
+            this.stateFacade.formFieldValueSet<F>( {
                 formField,
-                stateForm       : this._stateForm as keyof IContextStateDataForms,
+                stateForm       : this.stateForm as keyof IContextStateDataForms,
                 value           : e.target.value as F[keyof F],
                 valuesInitialGet: this.valuesInitialGet,
             } );

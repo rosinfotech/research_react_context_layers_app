@@ -19,6 +19,11 @@ import type {
     TId,
 } from "./types";
 
+interface IRepositoryEntityGetOptions {
+    id: TId;
+    stateRepository: keyof IContextStateDataRepositories;
+}
+
 interface IRepositoryListGetOptions<E> {
     idField: keyof E;
     listGetAPI: () => Promise<Array<E>>;
@@ -38,13 +43,22 @@ interface IRepositoryCreateOptions<E> {
     stateRepository: keyof IContextStateDataRepositories;
 }
 
+interface IRepositoryUpdateOptions<E> {
+    data: E;
+    idField: keyof E;
+    stateRepository: keyof IContextStateDataRepositories;
+    updateAPI: ( data: E ) => Promise<E>;
+}
+
 interface IFormValuesInitialSetOptions<F> {
+    entityId?: TId | null;
     force?: boolean;
     stateForm: keyof IContextStateDataForms;
     valuesInitialGet: () => F;
 }
 
 interface IFormFieldValueSetOptions<F, N extends keyof F = keyof F> {
+    entityId?: TId | null;
     formField: N;
     stateForm: keyof IContextStateDataForms;
     value: F[N];
@@ -52,14 +66,16 @@ interface IFormFieldValueSetOptions<F, N extends keyof F = keyof F> {
 }
 
 interface IFormDataSubmitOptions<F, E> {
+    entityId?: TId | null;
     formDataIsValid: ( data: F ) => boolean | IStateForm<F>["errors"];
     formDataToEntityAdapter: ( entity: F ) => E;
     stateForm: keyof IContextStateDataForms;
-    submit: ( entity: E ) => Promise<void>;
+    submit: ( entity: E ) => Promise<E>;
     valuesInitialGet: () => F;
 }
 
 interface IServiceValuesInitialSetOptions<S> {
+    entityId?: TId | null;
     force?: boolean;
     stateService: keyof IContextStateDataServices;
     valuesInitialGet: () => S;
@@ -162,6 +178,32 @@ export class ContextStateFacade {
         return true;
     }
 
+    public repositoryEntityGet<E>( options: IRepositoryEntityGetOptions ): E {
+        if ( !this.dataGet || !this.dataSet ) {
+            throw new ErrorCode( "0309232236" );
+        }
+
+        const { id, stateRepository: stateRepositoryKey } = options;
+
+        const state = this.dataGet();
+
+        const stateRepository = state.repositories[ stateRepositoryKey ];
+
+        if ( !isTDPStateRepository<E>( stateRepository ) ) {
+            throw new ErrorCode( "0309232237" );
+        }
+
+        if ( !stateRepository.data ) {
+            throw new ErrorCode( "0309232238" );
+        }
+
+        if ( !stateRepository.data.entities[ id ].data ) {
+            throw new ErrorCode( "0309232240" );
+        }
+
+        return stateRepository.data.entities[ id ].data as E;
+    }
+
     public async repositoryCreate<E>( options: IRepositoryCreateOptions<E> ) {
         if ( !this.dataGet || !this.dataSet ) {
             throw new ErrorCode( "0109231818" );
@@ -182,12 +224,7 @@ export class ContextStateFacade {
 
         stateRepository.isFetching = true;
 
-        this.dataSet( {
-            repositories: {
-                ...state.repositories,
-                [ stateRepositoryKey ]: stateRepository,
-            },
-        } );
+        this.dataSet( state );
 
         stateRepository.isFetching = false;
 
@@ -216,12 +253,9 @@ export class ContextStateFacade {
             pages.isOutdated = true;
         }
 
-        this.dataSet( {
-            repositories: {
-                ...state.repositories,
-                [ stateRepositoryKey ]: stateRepository,
-            },
-        } );
+        this.dataSet( state );
+
+        return item as E;
     }
 
     public async repositoryDelete<E>( options: IRepositoryDeleteOptions ) {
@@ -245,12 +279,7 @@ export class ContextStateFacade {
 
         stateRepository.isFetching = true;
 
-        this.dataSet( {
-            repositories: {
-                ...state.repositories,
-                [ stateRepositoryKey ]: stateRepository,
-            },
-        } );
+        this.dataSet( state );
 
         stateRepository.isFetching = false;
 
@@ -279,12 +308,51 @@ export class ContextStateFacade {
 
         await deleteAPI( id );
 
-        this.dataSet( {
-            repositories: {
-                ...state.repositories,
-                [ stateRepositoryKey ]: stateRepository,
-            },
-        } );
+        this.dataSet( state );
+    }
+
+    public async repositoryUpdate<E>( options: IRepositoryUpdateOptions<E> ) {
+        if ( !this.dataGet || !this.dataSet ) {
+            throw new ErrorCode( "0509230040" );
+        }
+        const { data, idField, stateRepository: stateRepositoryKey, updateAPI } = options;
+
+        const state = this.dataGet();
+
+        const stateRepository = state.repositories[ stateRepositoryKey ];
+
+        if ( !isTDPStateRepository<E>( stateRepository ) ) {
+            throw new ErrorCode( "0509230041" );
+        }
+
+        if ( !stateRepository.data ) {
+            throw new ErrorCode( "0509230042" );
+        }
+
+        stateRepository.isFetching = true;
+
+        this.dataSet( state );
+
+        stateRepository.isFetching = false;
+
+        const item = await updateAPI( data );
+
+        const timestamp = Date.now();
+
+        stateRepository.data.entities[ item[ idField ] as string ] = {
+            // @ts-expect-error TODO Predicate item assign to E
+            data      : item,
+            error     : undefined,
+            isError   : false,
+            isFetched : true,
+            isFetching: false,
+            isOutdated: false,
+            timestamp,
+        };
+
+        this.dataSet( state );
+
+        return item as E;
     }
 
     public async repositoryListGet<E>( options: IRepositoryListGetOptions<E> ) {
@@ -310,15 +378,12 @@ export class ContextStateFacade {
             throw new ErrorCode( "1608231308" );
         }
 
+        // @ts-expect-error Type 'TDPStateRepository<E>' is not assignable to type 'IDataProcessing<IStateRepository<IUser>>
+        state.repositories[ stateRepositoryKey ] = stateRepository;
+
         stateRepository.isFetching = true;
 
-        this.dataSet( {
-            repositories: {
-                ...state.repositories,
-                // @ts-expect-error TS does not recognize correspondence
-                [ stateRepositoryKey ]: stateRepository,
-            },
-        } );
+        this.dataSet( state );
 
         stateRepository.isFetching = false;
 
@@ -363,13 +428,7 @@ export class ContextStateFacade {
             return acc;
         }, stateRepository.data.lists[ DEFAULT_PARAMS_STRING ] );
 
-        this.dataSet( {
-            repositories: {
-                ...state.repositories,
-                // @ts-expect-error TS does not recognize correspondence
-                [ stateRepositoryKey ]: stateRepository,
-            },
-        } );
+        this.dataSet( state );
 
         return stateRepository.data.lists[ DEFAULT_PARAMS_STRING ].data;
     }
@@ -387,13 +446,10 @@ export class ContextStateFacade {
             return;
         }
 
-        this.dataSet( {
-            forms: {
-                ...state.forms,
-                // @ts-expect-error F does not extendable (?)
-                [ stateForm ]: ContextStateFacade.formGenerate( valuesInitialGet() ),
-            },
-        } );
+        // @ts-expect-error This type parameter might need an `extends ...` constraint.
+        state.forms[ stateForm ] = ContextStateFacade.formGenerate<F>( valuesInitialGet() );
+
+        this.dataSet( state );
     }
 
     public formFieldValueSet<F>( options: IFormFieldValueSetOptions<F> ) {
@@ -499,13 +555,10 @@ export class ContextStateFacade {
             return;
         }
 
-        this.dataSet( {
-            services: {
-                ...state.services,
-                // @ts-expect-error S does not extendable (?)
-                [ stateService ]: valuesInitialGet(),
-            },
-        } );
+        // @ts-expect-error This type parameter might need an `...` constraint.
+        state.services[ stateService ] = valuesInitialGet();
+
+        this.dataSet( state );
     }
 
     public servicePropertyValueSet ( options: IServicePropertyValueSetOptions ) {
@@ -521,12 +574,9 @@ export class ContextStateFacade {
 
         set( service, path, value );
 
-        this.dataSet( {
-            services: {
-                ...state.services,
-                [ stateService ]: service,
-            },
-        } );
+        state.services[ stateService ] = service;
+
+        this.dataSet( state );
     }
 
 }
