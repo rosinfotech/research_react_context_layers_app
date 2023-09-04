@@ -8,14 +8,14 @@ export class FormUserCreate extends FormAbstract<IUserFormCreate, IUser> {
     protected stateForm: keyof IContextStateDataForms = "formUserCreate";
 
     public valuesInitialEmptyGet () {
-        return ( {
+        return {
             email          : "",
             login          : "",
             name           : "",
             password       : "",
             passwordConfirm: "",
             surname        : "",
-        } ) as IUserFormCreate;
+        } as IUserFormCreate;
     }
 
     public valuesInitialGet () {
