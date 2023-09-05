@@ -6,9 +6,9 @@ import type { IContextStateDataRepositories, TId } from "@contexts/ContextState"
 
 export class RepositoryUsers extends RepositoryAbstract<IUser> {
 
-    protected stateRepository: keyof IContextStateDataRepositories = "repositoryUsers";
+    public stateRepository: keyof IContextStateDataRepositories = "repositoryUsers";
 
-    protected idField: keyof IUser = "id";
+    public idField: keyof IUser = "id";
 
     public async createAPI ( user: IUser ) {
         if ( !this.api ) {

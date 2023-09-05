@@ -2,8 +2,6 @@ import { ErrorCode, isObject, isString } from "@rosinfo.tech/utils";
 import { isObjectPlain } from "@utils/isObjectPlain";
 import { validatorMap } from "./constants";
 import type {
-    Entries,
-    Full,
     IValidateOptions,
     TValidateReturn,
     TValidatorMap,

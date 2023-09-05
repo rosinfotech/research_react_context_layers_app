@@ -2,7 +2,13 @@
 
 # Changelog
 
-## [ 0.0.7 - 0.0.11 ] - 2023-08-30
+## [ 0.0.12 - 0.0.13 ] - 2023-09-05
+
+- Added:
+
+  - "frontend" and "backend" spaces;
+
+## [ 0.0.7 - 0.0.11 ] - 2023-09-04
 
 - @contexts/ContextForms:
 

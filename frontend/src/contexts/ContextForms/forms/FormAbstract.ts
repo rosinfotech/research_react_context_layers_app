@@ -18,9 +18,9 @@ export class FormAbstract<F, E> {
 
     public stateFacade: ContextStateFacade | null = null;
 
-    protected stateForm: keyof IContextStateDataForms | null = null;
+    public stateForm: keyof IContextStateDataForms | null = null;
 
-    protected stateRepository: keyof IContextStateDataRepositories | null = null;
+    public stateRepository: keyof IContextStateDataRepositories | null = null;
 
     private _submit: ( ( entity: E ) => Promise<E> ) | null = null;
 

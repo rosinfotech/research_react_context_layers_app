@@ -1,6 +1,3 @@
-// TODO No reason to do this explicity
-export * from "./index.d";
-
 export type TValidator =
     | "Function"
     | "Equal"

@@ -22,12 +22,14 @@
     },
     "pack": {
         "production": {
+            "context": "./frontend/",
+            "nodeModulesPath": "./node_modules/",
             "filesProcessor": {
                 "before": [
                     [
                         "copy",
                         {
-                            "./src/assets/": "./build"
+                            "./src/assets/": "build"
                         }
                     ]
                 ]
@@ -75,63 +77,11 @@
                     ".json"
                 ]
             },
-            "target": "web",
-            "tsDeclarationsBundle": true
-        },
-        "production_rollup": {
-            "aliases": {
-                "@@types": "./src/types",
-                "@components": "./src/components",
-                "@contexts": "./src/contexts",
-                "@dialogs": "./src/dialogs",
-                "@forms": "./src/forms",
-                "@hocs": "./src/hocs",
-                "@hooks": "./src/hooks",
-                "@pages": "./src/pages",
-                "@renderers": "./src/renderers",
-                "@src": "./src",
-                "@utils": "./src/utils"
-            },
-            "filesProcessor": {
-                "before": [
-                    [
-                        "copy",
-                        {
-                            "./src/assets/": "./build"
-                        }
-                    ]
-                ]
-            },
-            "eslint": true,
-            "externals": {
-                "node_modules": false
-            },
-            "input": "./src/index.tsx",
-            "isProduction": true,
-            "outputDirectoryClear": true,
-            "output": {
-                "dir": "build",
-                "format": "umd"
-            },
-            "plugins": {
-                "alias": true,
-                "resolve": true,
-                "commonjs": true,
-                "typescript": {
-                    "tsconfig": "./tsconfig.json",
-                    "declaration": true,
-                    "declarationDir": "build"
-                },
-                "htmlTemplate": {
-                    "template": "./src/index.html"
-                },
-                "postcss": true,
-                "replace": true,
-                "terser": true
-            },
-            "tsDeclarationsBundle": true
+            "target": "web"
         },
         "development": {
+            "context": "./frontend/",
+            "nodeModulesPath": "./node_modules/",
             "assetsPath": "./src/assets/",
             "entry": "./src/index.tsx",
             "externals": {
@@ -178,5 +128,11 @@
         },
         "target": "web"
     },
-    "version": "0.0.11"
+    "version": {
+        "value": "0.0.13",
+        "packageJSONs": [
+            "./frontend/package.json",
+            "./frontend/package-lock.json"
+        ]
+    }
 }

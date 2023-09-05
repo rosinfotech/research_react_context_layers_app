@@ -8,7 +8,7 @@ export class ServiceAbstract<S> {
 
     public stateFacade: ContextStateFacade | null = null;
 
-    protected stateService: keyof IContextStateDataServices | null = null;
+    public stateService: keyof IContextStateDataServices | null = null;
 
     constructor () {
         this.valuesInitialSet = this.valuesInitialSet.bind( this );

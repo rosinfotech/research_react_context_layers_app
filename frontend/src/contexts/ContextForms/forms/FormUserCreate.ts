@@ -5,7 +5,7 @@ import type { IContextStateDataForms } from "@contexts/ContextState";
 
 export class FormUserCreate extends FormAbstract<IUserFormCreate, IUser> {
 
-    protected stateForm: keyof IContextStateDataForms = "formUserCreate";
+    public stateForm: keyof IContextStateDataForms = "formUserCreate";
 
     public valuesInitialEmptyGet () {
         return {

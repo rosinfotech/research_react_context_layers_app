@@ -5,7 +5,6 @@ import type { IUserFormCreate } from "@@types";
 import type { TFormButtonSubmitProps } from "@contexts/ContextForms";
 import type { FC } from "react";
 
-// TODO Naming same in FormContext
 export const FormUserCreate: FC<
 Pick<TFormButtonSubmitProps<IUserFormCreate, typeof Button>, "onSubmitted">
 > = props => (

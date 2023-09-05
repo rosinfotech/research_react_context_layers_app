@@ -4,7 +4,7 @@ import type { IContextStateDataServices } from "@contexts/ContextState";
 
 export class ServiceUI extends ServiceAbstract<IUI> {
 
-    protected stateService: keyof IContextStateDataServices = "serviceUI";
+    public stateService: keyof IContextStateDataServices = "serviceUI";
 
     constructor () {
         super();

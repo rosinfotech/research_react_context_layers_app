@@ -27,9 +27,9 @@ export class RepositoryAbstract<E> {
 
     public stateFacade: ContextStateFacade | null = null;
 
-    protected stateRepository: keyof IContextStateDataRepositories | null = null;
+    public stateRepository: keyof IContextStateDataRepositories | null = null;
 
-    protected idField: keyof E | null = null;
+    public idField: keyof E | null = null;
 
     public isInitialized () {
         return !!this.api && !!this.stateFacade && !!this.stateRepository && !!this.idField;

@@ -18,6 +18,8 @@
 
 ```shell
 
+npm --prefix frontend i
+
 npm i -g @rosinfo.tech/cli
 
 rosinfo.tech pack development

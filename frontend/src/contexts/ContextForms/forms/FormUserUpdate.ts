@@ -5,9 +5,9 @@ import type { IContextStateDataForms, IContextStateDataRepositories } from "@con
 
 export class FormUserUpdate extends FormAbstract<TUserFormUpdate, IUser> {
 
-    protected stateForm: keyof IContextStateDataForms = "formUserUpdate";
+    public stateForm: keyof IContextStateDataForms = "formUserUpdate";
 
-    protected stateRepository: keyof IContextStateDataRepositories = "repositoryUsers";
+    public stateRepository: keyof IContextStateDataRepositories = "repositoryUsers";
 
     public valuesInitialEmptyGet () {
         return {
